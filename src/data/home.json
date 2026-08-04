@@ -1,0 +1,256 @@
+{
+  "screenId": "home",
+  "schemaVersion": 1,
+  "title": "Cars24 Home",
+  "sections": [
+    {
+      "id": "header",
+      "type": "stack",
+      "style": { "backgroundColor": "#4B3AF0", "padding": 16, "gap": 12 },
+      "children": [
+        {
+          "id": "header_top_row",
+          "type": "row",
+          "style": { "justify": "space-between", "align": "center" },
+          "children": [
+            {
+              "id": "location_picker",
+              "type": "tappable",
+              "onTap": { "type": "openSheet", "sheet": "location_picker" },
+              "children": [
+                {
+                  "id": "location_row",
+                  "type": "row",
+                  "style": { "align": "center", "gap": 6 },
+                  "children": [
+                    { "id": "location_icon", "type": "icon", "props": { "name": "location", "size": 18 }, "style": { "color": "#FFFFFF" } },
+                    { "id": "location_text", "type": "text", "props": { "content": "Gurgaon", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
+                    { "id": "location_chevron", "type": "icon", "props": { "name": "chevron-down", "size": 16 }, "style": { "color": "#FFFFFF" } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "profile_button",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "profile" },
+              "children": [
+                { "id": "profile_icon", "type": "icon", "props": { "name": "person-circle", "size": 32 }, "style": { "color": "#FFFFFF" } }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "search_bar",
+          "type": "tappable",
+          "onTap": { "type": "navigate", "screen": "search" },
+          "children": [
+            {
+              "id": "search_row",
+              "type": "row",
+              "style": { "backgroundColor": "#6C5CE7", "borderRadius": 24, "padding": 12, "align": "center", "gap": 8 },
+              "children": [
+                { "id": "search_icon", "type": "icon", "props": { "name": "search", "size": 18 }, "style": { "color": "#E4E1FA" } },
+                { "id": "search_placeholder", "type": "text", "props": { "content": "Search Thar", "variant": "body" }, "style": { "color": "#E4E1FA" } }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "live_traffic_widget",
+      "type": "video_carousel",
+      "props": { "note": "Deliberately unregistered component type -- exercises the unknown-component fallback path." }
+    },
+    {
+      "id": "category_tabs",
+      "type": "carousel",
+      "style": { "backgroundColor": "#4B3AF0", "paddingHorizontal": 16, "paddingVertical": 8 },
+      "children": [
+        { "id": "tab_all", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "all" }, "children": [ { "id": "tab_all_btn", "type": "button", "props": { "label": "All", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_buy", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "buy_used_car" } }, "children": [ { "id": "tab_buy_btn", "type": "button", "props": { "label": "Buy used car", "variant": "chip" } } ] },
+        { "id": "tab_sell", "type": "tappable", "onTap": { "type": "navigate", "screen": "sell" }, "children": [ { "id": "tab_sell_btn", "type": "button", "props": { "label": "Sell car", "variant": "chip" } } ] },
+        { "id": "tab_loans", "type": "tappable", "onTap": { "type": "navigate", "screen": "loans" }, "children": [ { "id": "tab_loans_btn", "type": "button", "props": { "label": "Loans", "variant": "chip" } } ] },
+        { "id": "tab_challan", "type": "tappable", "onTap": { "type": "navigate", "screen": "challan" }, "children": [ { "id": "tab_challan_btn", "type": "button", "props": { "label": "Challan", "variant": "chip" } } ] }
+      ]
+    },
+    {
+      "id": "buy_car_section",
+      "type": "stack",
+      "style": { "padding": 16, "gap": 12 },
+      "children": [
+        {
+          "id": "buy_car_header",
+          "type": "row",
+          "style": { "align": "center", "gap": 8 },
+          "children": [
+            { "id": "buy_car_title", "type": "text", "props": { "content": "Buy car", "variant": "title" } },
+            { "id": "buy_car_badge", "type": "badge", "props": { "text": "Up to ₹80,000 off", "tone": "danger" } }
+          ]
+        },
+        {
+          "id": "buy_car_rail",
+          "type": "carousel",
+          "children": [
+            {
+              "id": "buy_card_all",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "all" } },
+              "children": [
+                {
+                  "id": "buy_card_all_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
+                  "children": [
+                    { "id": "buy_card_all_text", "type": "text", "props": { "content": "All used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
+                    { "id": "buy_card_all_image", "type": "image", "props": { "uri": "https://example.com/car-orange.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "buy_card_budget",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "budget" } },
+              "children": [
+                {
+                  "id": "buy_card_budget_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
+                  "children": [
+                    { "id": "buy_card_budget_text", "type": "text", "props": { "content": "Budget used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
+                    { "id": "buy_card_budget_image", "type": "image", "props": { "uri": "https://example.com/car-white.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "buy_card_premium",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "premium" } },
+              "children": [
+                {
+                  "id": "buy_card_premium_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
+                  "children": [
+                    { "id": "buy_card_premium_text", "type": "text", "props": { "content": "Premium used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
+                    { "id": "buy_card_premium_image", "type": "image", "props": { "uri": "https://example.com/car-yellow.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "car_listings_section",
+      "type": "stack",
+      "style": { "padding": 16, "gap": 12 },
+      "children": [
+        { "id": "car_listings_title", "type": "text", "props": { "content": "Best deals for you", "variant": "title" } },
+        {
+          "id": "car_listings_rail",
+          "type": "carousel",
+          "children": [
+            {
+              "id": "car_card_baleno",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "car_detail", "params": { "listingId": "baleno-2015" } },
+              "children": [
+                {
+                  "id": "car_card_baleno_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "padding": 12, "width": 280, "gap": 6 },
+                  "children": [
+                    { "id": "car_baleno_image", "type": "image", "props": { "uri": "https://example.com/baleno.png" }, "style": { "aspectRatio": 1.7 } },
+                    { "id": "car_baleno_stock_badge", "type": "badge", "props": { "text": "Cars24 Owned stock", "tone": "info" } },
+                    { "id": "car_baleno_title", "type": "text", "props": { "content": "2015 Maruti Baleno", "variant": "subtitle" }, "style": { "fontWeight": "700" } },
+                    { "id": "car_baleno_variant", "type": "text", "props": { "content": "DELTA CVT PETROL 1.2", "variant": "caption" } },
+                    {
+                      "id": "car_baleno_specs",
+                      "type": "row",
+                      "style": { "gap": 6 },
+                      "children": [
+                        { "id": "car_baleno_spec_km", "type": "badge", "props": { "text": "92,838 km" } },
+                        { "id": "car_baleno_spec_fuel", "type": "badge", "props": { "text": "Petrol" } },
+                        { "id": "car_baleno_spec_trans", "type": "badge", "props": { "text": "Auto" } }
+                      ]
+                    },
+                    { "id": "car_baleno_price", "type": "text", "props": { "content": "₹3.87 lakh  |  EMI ₹10,191/m*", "variant": "body" }, "style": { "fontWeight": "700" } },
+                    {
+                      "id": "car_baleno_cta_row",
+                      "type": "row",
+                      "style": { "justify": "space-between" },
+                      "children": [
+                        { "id": "car_baleno_test_drive", "type": "tappable", "onTap": { "type": "navigate", "screen": "test_drive", "params": { "listingId": "baleno-2015" } }, "children": [ { "id": "car_baleno_test_drive_btn", "type": "button", "props": { "label": "Free Test Drive", "variant": "text" } } ] },
+                        { "id": "car_baleno_view_details", "type": "tappable", "onTap": { "type": "navigate", "screen": "car_detail", "params": { "listingId": "baleno-2015" } }, "children": [ { "id": "car_baleno_view_details_btn", "type": "button", "props": { "label": "View Details", "variant": "text" } } ] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manage_vehicle_section",
+      "type": "stack",
+      "style": { "backgroundColor": "#4B3AF0", "padding": 16, "gap": 12 },
+      "children": [
+        {
+          "id": "manage_vehicle_header",
+          "type": "row",
+          "style": { "justify": "space-between", "align": "center" },
+          "children": [
+            { "id": "manage_vehicle_title", "type": "text", "props": { "content": "Manage your vehicle", "variant": "title" }, "style": { "color": "#FFFFFF" } },
+            { "id": "manage_vehicle_add", "type": "tappable", "onTap": { "type": "navigate", "screen": "add_vehicle" }, "children": [ { "id": "manage_vehicle_add_text", "type": "text", "props": { "content": "+ Add vehicle", "variant": "label" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } } ] }
+          ]
+        },
+        {
+          "id": "manage_vehicle_grid",
+          "type": "grid",
+          "props": { "columns": 3 },
+          "children": [
+            { "id": "svc_challan", "type": "tappable", "onTap": { "type": "navigate", "screen": "challan_payment" }, "children": [ { "id": "svc_challan_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_challan_text", "type": "text", "props": { "content": "Pay challan", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_challan_icon", "type": "icon", "props": { "name": "receipt-outline", "size": 28 } } ] } ] },
+            { "id": "svc_fastag", "type": "tappable", "onTap": { "type": "navigate", "screen": "fastag_recharge" }, "children": [ { "id": "svc_fastag_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_fastag_text", "type": "text", "props": { "content": "Recharge FASTag", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_fastag_icon", "type": "icon", "props": { "name": "card-outline", "size": 28 } } ] } ] },
+            { "id": "svc_insurance", "type": "tappable", "onTap": { "type": "navigate", "screen": "insurance" }, "children": [ { "id": "svc_insurance_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_insurance_text", "type": "text", "props": { "content": "Get insurance", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_insurance_icon", "type": "icon", "props": { "name": "shield-checkmark-outline", "size": 28 } } ] } ] },
+            { "id": "svc_cash", "type": "tappable", "onTap": { "type": "navigate", "screen": "cash_against_car" }, "children": [ { "id": "svc_cash_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_cash_text", "type": "text", "props": { "content": "Cash against car", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_cash_icon", "type": "icon", "props": { "name": "cash-outline", "size": 28 } } ] } ] },
+            { "id": "svc_roadside", "type": "tappable", "onTap": { "type": "navigate", "screen": "roadside_assistance" }, "children": [ { "id": "svc_roadside_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_roadside_text", "type": "text", "props": { "content": "Road side assistance", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_roadside_icon", "type": "icon", "props": { "name": "alert-circle-outline", "size": 28 } } ] } ] },
+            { "id": "svc_warranty", "type": "tappable", "onTap": { "type": "navigate", "screen": "warranty" }, "children": [ { "id": "svc_warranty_card", "type": "stack", "style": { "backgroundColor": "#FFFFFF", "borderRadius": 10, "padding": 12, "gap": 4 }, "children": [ { "id": "svc_warranty_text", "type": "text", "props": { "content": "Get warranty", "variant": "label" }, "style": { "fontWeight": "700" } }, { "id": "svc_warranty_icon", "type": "icon", "props": { "name": "shield-outline", "size": 28 } } ] } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "promo_banner",
+      "type": "tappable",
+      "onTap": { "type": "openUrl", "url": "https://cars24.com/orbit" },
+      "children": [
+        {
+          "id": "promo_banner_body",
+          "type": "stack",
+          "style": { "backgroundColor": "#0F5132", "borderRadius": 16, "padding": 20, "margin": 16, "gap": 8 },
+          "children": [
+            { "id": "promo_banner_title", "type": "text", "props": { "content": "Add your car to Orbit", "variant": "title" }, "style": { "color": "#FFFFFF" } },
+            { "id": "promo_banner_subtitle", "type": "text", "props": { "content": "Enjoy 3-months Spotify Premium free", "variant": "body" }, "style": { "color": "#D1E7DD" } },
+            { "id": "promo_banner_cta", "type": "button", "props": { "label": "Add car now", "variant": "secondary" } }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer",
+      "type": "stack",
+      "style": { "backgroundColor": "#6C5CE7", "padding": 24, "gap": 8 },
+      "children": [
+        { "id": "footer_tagline", "type": "text", "props": { "content": "better drives, better lives", "variant": "title" }, "style": { "color": "#FFFFFF", "fontSize": 28, "fontWeight": "700" } },
+        { "id": "footer_credit", "type": "text", "props": { "content": "Made with ❤️ in Gurugram", "variant": "body" }, "style": { "color": "#E4E1FA" } }
+      ]
+    }
+  ]
+}
