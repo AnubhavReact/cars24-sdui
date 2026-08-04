@@ -25,10 +25,23 @@ Captured from the real Cars24 app running on the Pixel_7 emulator
 Has rails (horizontal) and a grid (vertical), and the category-tab selector is a
 strong candidate for the required SDUI-driven interactive element.
 
-## Open questions to resolve during schema design
+## Findings from live exploration (real app, via emulator + adb)
 
-- Does the category tab selection actually re-filter the sections below, or
-  just navigate? (Need to tap it and observe — not yet confirmed.)
-- The "tenure selector -> EMI" interaction mentioned in the brief isn't on this
-  page as-is; may need to add it inside the car card / a detail sheet, or
-  pick a different concrete interactive element and justify it in the README.
+- **Category tabs navigate, they don't filter in place.** Tapping "Buy used
+  car" on the home page pushes a full listing/search screen (filters, sort,
+  budget chips, results count, car cards with "Free Test Drive" / "View
+  Details"). So the tab selector is a `navigate` action, not an in-place
+  content swap — model it that way in the schema (an action with a
+  `navigate` type + target screen id, not a conditional-render toggle).
+- The listing screen -> car detail screen is a good candidate for the
+  "different screen" surprise test in round 1: it reuses some patterns (car
+  card) but adds new ones (image carousel with tabs, EMI/price block, sticky
+  bottom CTA bar).
+- The brief's "tenure selector -> EMI" example isn't present in-place on
+  these screens as tested — "Check eligibility" on the car detail page
+  bounced back without showing a sheet (likely gated behind login). Not
+  chasing this further; per the brief this was only an example ("e.g.") of
+  a valid interactive action. **Decision: use the category-tab
+  navigation action (or an equivalent chip/tab selection with visible
+  content change) as our required SDUI-driven interactive element**, and
+  note this substitution explicitly in the README.
