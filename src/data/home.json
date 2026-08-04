@@ -6,7 +6,7 @@
     {
       "id": "header",
       "type": "stack",
-      "style": { "backgroundColor": "#0F766E", "padding": 16, "gap": 12 },
+      "style": { "backgroundColor": "#4B3AF0", "padding": 16, "gap": 12 },
       "children": [
         {
           "id": "header_top_row",
@@ -54,23 +54,6 @@
                 { "id": "search_placeholder", "type": "text", "props": { "content": "Search Thar", "variant": "body" }, "style": { "color": "#E4E1FA" } }
               ]
             }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "diwali_sale_banner",
-      "type": "tappable",
-      "onTap": { "type": "navigate", "screen": "diwali_sale" },
-      "children": [
-        {
-          "id": "diwali_sale_banner_body",
-          "type": "stack",
-          "style": { "backgroundColor": "#B45309", "borderRadius": 16, "padding": 20, "margin": 16, "gap": 8 },
-          "children": [
-            { "id": "diwali_sale_title", "type": "text", "props": { "content": "Diwali Dhamaka Sale" }, "style": { "color": "#FFFFFF", "fontSize": 22, "fontWeight": "700" } },
-            { "id": "diwali_sale_subtitle", "type": "text", "props": { "content": "This section did not exist a minute ago -- it was added by editing home.json only, no client code touched.", "variant": "body" }, "style": { "color": "#FFEDD5" } },
-            { "id": "diwali_sale_cta", "type": "button", "props": { "label": "Shop the sale", "variant": "secondary" } }
           ]
         }
       ]
