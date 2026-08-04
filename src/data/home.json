@@ -104,7 +104,7 @@
                   "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
                   "children": [
                     { "id": "buy_card_all_text", "type": "text", "props": { "content": "All used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
-                    { "id": "buy_card_all_image", "type": "image", "props": { "uri": "https://example.com/car-orange.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                    { "id": "buy_card_all_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-orange/400/250" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
                   ]
                 }
               ]
@@ -120,7 +120,7 @@
                   "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
                   "children": [
                     { "id": "buy_card_budget_text", "type": "text", "props": { "content": "Budget used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
-                    { "id": "buy_card_budget_image", "type": "image", "props": { "uri": "https://example.com/car-white.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                    { "id": "buy_card_budget_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-white/400/250" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
                   ]
                 }
               ]
@@ -136,7 +136,7 @@
                   "style": { "backgroundColor": "#1E3A8A", "borderRadius": 12, "padding": 16, "width": 160 },
                   "children": [
                     { "id": "buy_card_premium_text", "type": "text", "props": { "content": "Premium used cars", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
-                    { "id": "buy_card_premium_image", "type": "image", "props": { "uri": "https://example.com/car-yellow.png" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
+                    { "id": "buy_card_premium_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-yellow/400/250" }, "style": { "aspectRatio": 1.6, "marginVertical": 8 } }
                   ]
                 }
               ]
@@ -165,7 +165,7 @@
                   "type": "stack",
                   "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "padding": 12, "width": 280, "gap": 6 },
                   "children": [
-                    { "id": "car_baleno_image", "type": "image", "props": { "uri": "https://example.com/baleno.png" }, "style": { "aspectRatio": 1.7 } },
+                    { "id": "car_baleno_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-baleno/400/250" }, "style": { "aspectRatio": 1.7 } },
                     { "id": "car_baleno_stock_badge", "type": "badge", "props": { "text": "Cars24 Owned stock", "tone": "info" } },
                     { "id": "car_baleno_title", "type": "text", "props": { "content": "2015 Maruti Baleno", "variant": "subtitle" }, "style": { "fontWeight": "700" } },
                     { "id": "car_baleno_variant", "type": "text", "props": { "content": "DELTA CVT PETROL 1.2", "variant": "caption" } },

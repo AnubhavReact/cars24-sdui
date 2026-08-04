@@ -14,7 +14,7 @@ function HomeScreenInner() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{ paddingTop: topPad }}>
         {screen.sections.map((node) => (
           <RenderNode key={node.id} node={node} />
         ))}
