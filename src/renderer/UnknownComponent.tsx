@@ -1,13 +1,20 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 import type { Node } from '../schema/types';
+import { CLIENT_SCHEMA_VERSION } from '../schema/version';
 
-// Server sent a component type this client doesn't have a renderer for.
-// In dev, show a visible-but-harmless placeholder so it's obvious in the
-// fallback demo. In production, render nothing -- the page must never crash
-// on an unknown type, and a silent gap beats a redbox.
+// Covers two distinct degrade paths that both need to end up here:
+// 1. an unknown `type` this client has no renderer for
+// 2. a known `type` whose `minVersion` is newer than this client supports
+// In dev, show a visible-but-harmless placeholder so both are obvious in
+// the fallback demo. In production, render nothing -- the page must never
+// crash or show debug text, and a silent gap beats a redbox either way.
 export function UnknownComponent({ node }: { node: Node }) {
   if (__DEV__) {
+    const isVersionMismatch = node.minVersion !== undefined && node.minVersion > CLIENT_SCHEMA_VERSION;
+    const reason = isVersionMismatch
+      ? `requires schema v${node.minVersion}, this client supports v${CLIENT_SCHEMA_VERSION}`
+      : `unknown type "${node.type}"`;
     return (
       <View
         style={{
@@ -20,7 +27,7 @@ export function UnknownComponent({ node }: { node: Node }) {
         }}
       >
         <Text style={{ color: '#B45309', fontSize: 12 }}>
-          Unsupported component: "{node.type}" (id: {node.id})
+          Skipped (id: {node.id}) -- {reason}
         </Text>
       </View>
     );

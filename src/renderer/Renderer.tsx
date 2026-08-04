@@ -7,6 +7,7 @@ import { ButtonView } from './ButtonView';
 import { evalCondition } from './evalCondition';
 import { toTextStyle, toneColor, toViewStyle } from './styleUtils';
 import { UnknownComponent } from './UnknownComponent';
+import { CLIENT_SCHEMA_VERSION } from '../schema/version';
 
 // The component registry: a plain map from `type` string to a renderer.
 // A miss here is *not* an error -- it's exactly the unknown-component case,
@@ -31,6 +32,12 @@ export function RenderNode({ node }: { node: Node }) {
   const { state, dispatch } = useSdui();
 
   if (!evalCondition(node.visibleIf, state)) return null;
+
+  // A node built for a newer schema than this client understands degrades
+  // exactly like an unknown component type -- see src/schema/version.ts.
+  if (node.minVersion !== undefined && node.minVersion > CLIENT_SCHEMA_VERSION) {
+    return <UnknownComponent node={node} />;
+  }
 
   const content = renderByType(node);
 

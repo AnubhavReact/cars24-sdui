@@ -64,6 +64,12 @@
       "props": { "note": "Deliberately unregistered component type -- exercises the unknown-component fallback path." }
     },
     {
+      "id": "ar_preview_banner",
+      "type": "badge",
+      "minVersion": 2,
+      "props": { "text": "This node requires schema v2 -- exercises the versioning fallback path (distinct from an unknown type)." }
+    },
+    {
       "id": "category_tabs",
       "type": "carousel",
       "style": { "backgroundColor": "#4B3AF0", "paddingHorizontal": 16, "paddingVertical": 8 },
