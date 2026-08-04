@@ -244,6 +244,130 @@
       ]
     },
     {
+      "id": "showrooms_section",
+      "type": "stack",
+      "style": { "padding": 16, "gap": 12 },
+      "children": [
+        { "id": "showrooms_title", "type": "text", "props": { "content": "2 showrooms in your city", "variant": "title" } },
+        {
+          "id": "showrooms_rail",
+          "type": "carousel",
+          "children": [
+            {
+              "id": "showroom_udyog_vihar",
+              "type": "stack",
+              "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "width": 300, "gap": 6, "padding": 12 },
+              "children": [
+                { "id": "showroom_udyog_vihar_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-showroom-1/400/220" }, "style": { "aspectRatio": 1.8, "borderRadius": 8 } },
+                { "id": "showroom_udyog_vihar_name", "type": "text", "props": { "content": "Udyog Vihar, Sector 18, Gurugram", "variant": "subtitle" }, "style": { "fontWeight": "700" } },
+                { "id": "showroom_udyog_vihar_meta", "type": "text", "props": { "content": "50+ cars  |  2.2 km away  |  Open, closes 09:00 PM", "variant": "caption" } },
+                {
+                  "id": "showroom_udyog_vihar_cta_row",
+                  "type": "row",
+                  "style": { "gap": 8 },
+                  "children": [
+                    { "id": "showroom_udyog_vihar_call", "type": "tappable", "onTap": { "type": "call", "phoneNumber": "+911244567890" }, "children": [ { "id": "showroom_udyog_vihar_call_btn", "type": "button", "props": { "label": "Call us now", "variant": "secondary" } } ] },
+                    { "id": "showroom_udyog_vihar_view", "type": "tappable", "onTap": { "type": "navigate", "screen": "showroom_detail", "params": { "showroomId": "udyog-vihar" } }, "children": [ { "id": "showroom_udyog_vihar_view_btn", "type": "button", "props": { "label": "View showroom", "variant": "primary" } } ] }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "showroom_m3m",
+              "type": "stack",
+              "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "width": 300, "gap": 6, "padding": 12 },
+              "children": [
+                { "id": "showroom_m3m_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-showroom-2/400/220" }, "style": { "aspectRatio": 1.8, "borderRadius": 8 } },
+                { "id": "showroom_m3m_name", "type": "text", "props": { "content": "M3M Urbana, Golf Course Rd", "variant": "subtitle" }, "style": { "fontWeight": "700" } },
+                { "id": "showroom_m3m_meta", "type": "text", "props": { "content": "290+ cars  |  8.9 km away  |  Open", "variant": "caption" } },
+                {
+                  "id": "showroom_m3m_cta_row",
+                  "type": "row",
+                  "style": { "gap": 8 },
+                  "children": [
+                    { "id": "showroom_m3m_call", "type": "tappable", "onTap": { "type": "call", "phoneNumber": "+911244567891" }, "children": [ { "id": "showroom_m3m_call_btn", "type": "button", "props": { "label": "Call us now", "variant": "secondary" } } ] },
+                    { "id": "showroom_m3m_view", "type": "tappable", "onTap": { "type": "navigate", "screen": "showroom_detail", "params": { "showroomId": "m3m-urbana" } }, "children": [ { "id": "showroom_m3m_view_btn", "type": "button", "props": { "label": "View showroom", "variant": "primary" } } ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trending_section",
+      "type": "stack",
+      "style": { "padding": 16, "gap": 12 },
+      "children": [
+        {
+          "id": "trending_header",
+          "type": "row",
+          "style": { "justify": "space-between", "align": "center" },
+          "children": [
+            { "id": "trending_title", "type": "text", "props": { "content": "Trending new cars", "variant": "title" } },
+            { "id": "trending_view_all", "type": "tappable", "onTap": { "type": "navigate", "screen": "new_cars" }, "children": [ { "id": "trending_view_all_text", "type": "text", "props": { "content": "View all", "variant": "label" }, "style": { "color": "#4B3AF0", "fontWeight": "700" } } ] }
+          ]
+        },
+        {
+          "id": "trending_rail",
+          "type": "carousel",
+          "children": [
+            { "id": "trending_seltos", "type": "tappable", "onTap": { "type": "navigate", "screen": "new_car_detail", "params": { "model": "seltos" } }, "children": [ { "id": "trending_seltos_body", "type": "stack", "style": { "backgroundColor": "#F3F4F6", "borderRadius": 12, "width": 150, "padding": 12, "gap": 4 }, "children": [ { "id": "trending_seltos_name", "type": "text", "props": { "content": "Seltos", "variant": "subtitle" }, "style": { "fontWeight": "700" } }, { "id": "trending_seltos_make", "type": "text", "props": { "content": "Kia", "variant": "caption" } }, { "id": "trending_seltos_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-seltos/300/200" }, "style": { "aspectRatio": 1.4, "marginVertical": 8 } } ] } ] },
+            { "id": "trending_sonet", "type": "tappable", "onTap": { "type": "navigate", "screen": "new_car_detail", "params": { "model": "sonet" } }, "children": [ { "id": "trending_sonet_body", "type": "stack", "style": { "backgroundColor": "#F3F4F6", "borderRadius": 12, "width": 150, "padding": 12, "gap": 4 }, "children": [ { "id": "trending_sonet_name", "type": "text", "props": { "content": "Sonet", "variant": "subtitle" }, "style": { "fontWeight": "700" } }, { "id": "trending_sonet_make", "type": "text", "props": { "content": "Kia", "variant": "caption" } }, { "id": "trending_sonet_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-sonet/300/200" }, "style": { "aspectRatio": 1.4, "marginVertical": 8 } } ] } ] },
+            { "id": "trending_syros", "type": "tappable", "onTap": { "type": "navigate", "screen": "new_car_detail", "params": { "model": "syros" } }, "children": [ { "id": "trending_syros_body", "type": "stack", "style": { "backgroundColor": "#F3F4F6", "borderRadius": 12, "width": 150, "padding": 12, "gap": 4 }, "children": [ { "id": "trending_syros_name", "type": "text", "props": { "content": "Syros", "variant": "subtitle" }, "style": { "fontWeight": "700" } }, { "id": "trending_syros_make", "type": "text", "props": { "content": "Kia", "variant": "caption" } }, { "id": "trending_syros_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-syros/300/200" }, "style": { "aspectRatio": 1.4, "marginVertical": 8 } } ] } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "value_prop_carousel",
+      "type": "carousel",
+      "style": { "paddingHorizontal": 16, "paddingVertical": 12, "gap": 12 },
+      "children": [
+        {
+          "id": "value_prop_return",
+          "type": "tappable",
+          "onTap": { "type": "navigate", "screen": "return_policy" },
+          "children": [
+            {
+              "id": "value_prop_return_body",
+              "type": "stack",
+              "style": { "backgroundColor": "#4338CA", "borderRadius": 16, "padding": 20, "width": 320, "gap": 8 },
+              "children": [
+                { "id": "value_prop_return_title", "type": "text", "props": { "content": "30 Day Return Guarantee" }, "style": { "color": "#FFFFFF", "fontSize": 20, "fontWeight": "700" } },
+                { "id": "value_prop_return_subtitle", "type": "text", "props": { "content": "We take it back as easily as we deliver it", "variant": "body" }, "style": { "color": "#E0E7FF" } },
+                { "id": "value_prop_return_cta", "type": "button", "props": { "label": "Know more", "variant": "secondary" } }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "value_prop_crashfree",
+          "type": "tappable",
+          "onTap": { "type": "navigate", "screen": "crashfree_india" },
+          "children": [
+            {
+              "id": "value_prop_crashfree_body",
+              "type": "stack",
+              "style": { "backgroundColor": "#4F46E5", "borderRadius": 16, "padding": 20, "width": 320, "gap": 8 },
+              "children": [
+                { "id": "value_prop_crashfree_tag", "type": "text", "props": { "content": "CRASHFREE INDIA", "variant": "caption" }, "style": { "color": "#FDE68A", "fontWeight": "700" } },
+                { "id": "value_prop_crashfree_title", "type": "text", "props": { "content": "Control. Judgment. Patience.", "variant": "subtitle" }, "style": { "color": "#FFFFFF", "fontWeight": "700" } },
+                { "id": "value_prop_crashfree_cta", "type": "button", "props": { "label": "Explore now", "variant": "secondary" } }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer_divider",
+      "type": "divider",
+      "props": { "thickness": 1 },
+      "style": { "marginVertical": 8 }
+    },
+    {
       "id": "footer",
       "type": "stack",
       "style": { "backgroundColor": "#6C5CE7", "padding": 24, "gap": 8 },
