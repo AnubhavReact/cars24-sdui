@@ -1,20 +1,58 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StatusBar, Text, View } from 'react-native';
 import { SduiProvider, useSdui } from '../../actions/context';
 import { RenderNode } from '../../renderer/Renderer';
-import homeJson from '../../data/home.json';
+import homeJsonRaw from '../../data/home.json';
 import type { Screen } from '../../schema/types';
+import { mark } from '../../perf/timing';
+import { createFrameJankTracker } from '../../perf/scrollJank';
+import { runAfterPaint } from '../../perf/runAfterPaint';
 
-const screen = homeJson as unknown as Screen;
+const screen = homeJsonRaw as unknown as Screen;
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
+
+mark('sdui_module_eval_done');
+// Synthetic parse-cost estimate: the real payload is `require`d as part of the
+// JS bundle (no network fetch, no string parse), so there is no naturally
+// isolated "JSON parse" phase to measure. This stringifies + re-parses the
+// same payload once to give an honest, clearly-labeled estimate of what that
+// phase would cost if this were fetched over the wire as JSON text -- see
+// PERF.md for how this number is used and its caveats.
+const jsonParseBenchStart = Date.now();
+JSON.parse(JSON.stringify(homeJsonRaw));
+const jsonParseBenchMs = Date.now() - jsonParseBenchStart;
+
+const jank = createFrameJankTracker();
 
 function HomeScreenInner() {
   const { stack, pop, activeSheet, closeSheet } = useSdui();
   const top = stack[stack.length - 1];
+  const mountStart = useRef(Date.now()).current;
+
+  useEffect(() => {
+    mark('sdui_mount_committed');
+    runAfterPaint(() => {
+      mark('sdui_interactions_ready');
+    });
+    // eslint-disable-next-line no-console
+    console.log(`[perf] sdui_json_parse_bench: ${jsonParseBenchMs}ms (synthetic, see PERF.md)`);
+    // eslint-disable-next-line no-console
+    console.log(`[perf] sdui_mount_to_commit: ${Date.now() - mountStart}ms`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <ScrollView contentContainerStyle={{ paddingTop: topPad }}>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: topPad }}
+        onLayout={() => mark('sdui_first_layout')}
+        onScrollBeginDrag={() => jank.start()}
+        onScrollEndDrag={() => {
+          const { droppedFrames, totalFrames } = jank.stop();
+          // eslint-disable-next-line no-console
+          console.log(`[perf] sdui_scroll_jank: ${droppedFrames} dropped / ${totalFrames} frames`);
+        }}
+      >
         {screen.sections.map((node) => (
           <RenderNode key={node.id} node={node} />
         ))}
