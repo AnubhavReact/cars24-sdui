@@ -162,17 +162,22 @@ section in your README is enough" allowance.
 - **No data/template layer.** JSON payloads are fully-specified node trees,
   not data + reusable templates. Verbose but simpler; see schema rationale
   above.
-- **One navigation target is fully real; the rest are placeholders.** The
-  "listing" destination (reached from the category tab and all three
-  "Buy car" rail cards) is a genuine param-driven screen: `navigate`
-  carries a `category` param, `src/server/mockServer.ts` simulates an async
-  server call keyed by that param, and a different `Screen` JSON comes back
-  and renders through the exact same `RenderNode`/registry as the home
-  screen -- "budget" and "premium" visibly return different cars, not the
-  same data relabeled. Every other `navigate` target (car detail, profile,
-  search, sell, loans...) still renders a generic "Screen: X, params: Y"
-  placeholder, proving the action mechanism carries real data without
-  building out every destination screen under the timebox.
+- **Two navigation targets are fully real; every other one resolves to a
+  clean generic screen, never a raw debug dump.** "listing" (reached from
+  the category tab and "Buy car" rail) and "car_detail" (reached from
+  every car card) are genuine param-driven screens: `navigate` carries a
+  param, `src/server/mockServer.ts` simulates an async server call keyed
+  by it, and a different `Screen` JSON comes back and renders through the
+  exact same `RenderNode`/registry as the home screen -- "budget" and
+  "premium" visibly return different cars, not the same data relabeled.
+  Every other `navigate` target (profile, search, sell, loans, insurance,
+  warranty...) resolves through the same mock server's generic fallback
+  (`buildGenericScreen`), which still returns real `Screen` JSON -- an
+  icon, a humanized title, and any params rendered as badge chips -- so
+  there is no path in the app that shows an unstyled "Screen: X, params:
+  {...}" text dump. Building out full, unique layouts for all fifteen-plus
+  destinations was out of scope under the timebox; making every one of
+  them resolve to *something* real through the JSON pipeline was not.
 - **The brief's tenure-selector → EMI example isn't on this page as-is.**
   Confirmed live on the real app (see `docs/screen-inventory.md`) -- "Check
   eligibility" on the car-detail page needs login before showing anything.
