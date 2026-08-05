@@ -46,11 +46,20 @@ const CATALOG: Record<string, { label: string; cars: CarListing[] }> = {
   buy_used_car: {
     label: 'Buy used car',
     cars: [
-      { id: 'baleno-2015b', title: '2015 Maruti Baleno', variant: 'DELTA CVT PETROL 1.2', km: '92,838 km', fuel: 'Petrol', transmission: 'Auto', price: '₹3.87 lakh', emi: '₹10,191/m*', imageSeed: 'cars24-baleno', badge: 'Cars24 Owned stock' },
+      { id: 'baleno-2015', title: '2015 Maruti Baleno', variant: 'DELTA CVT PETROL 1.2', km: '92,838 km', fuel: 'Petrol', transmission: 'Auto', price: '₹3.87 lakh', emi: '₹10,191/m*', imageSeed: 'cars24-baleno', badge: 'Cars24 Owned stock' },
       { id: 'xuv300-2023', title: '2023 Mahindra XUV300', variant: 'W6 1.2 PETROL', km: '25,335 km', fuel: 'Petrol', transmission: 'Manual', price: '₹6.60 lakh', emi: '₹11,651/m*', imageSeed: 'listing-xuv300', badge: 'Cars24 Owned stock' },
     ],
   },
 };
+
+// Flat id -> car lookup, derived from the same catalog used for listings, so
+// the car-detail screen and every listing/rail that links to it always agree
+// on price/spec data for a given id -- one source of truth, not two.
+const CAR_INDEX: Record<string, CarListing> = Object.fromEntries(
+  Object.values(CATALOG)
+    .flatMap((entry) => entry.cars)
+    .map((car) => [car.id, car])
+);
 
 function buildCarCardNode(car: CarListing): Node {
   return {
@@ -123,6 +132,107 @@ function buildListingScreen(params: Record<string, string>): Screen {
   };
 }
 
+// Real Cars24 car-detail layout, matched against a live capture of the
+// actual app (docs/reference-screenshots/car-detail-1.png): spec chip row
+// over a hero image, title+variant, location, feature badges, an EMI box,
+// a price box, and a two-button CTA row. Every car in CAR_INDEX renders
+// through this same shape -- only the data differs, no new component types.
+function buildCarDetailScreen(listingId: string): Screen {
+  const car = CAR_INDEX[listingId];
+
+  if (!car) {
+    return {
+      screenId: 'car_detail',
+      schemaVersion: 1,
+      title: 'Not found',
+      sections: [
+        { id: 'car_detail_not_found', type: 'text', props: { content: `No listing found for id "${listingId}"` }, style: { padding: 16, color: '#6B7280' } },
+      ],
+    };
+  }
+
+  return {
+    screenId: 'car_detail',
+    schemaVersion: 1,
+    title: car.title,
+    sections: [
+      { id: 'car_detail_image', type: 'image', props: { uri: `https://picsum.photos/seed/${car.imageSeed}/700/450` }, style: { aspectRatio: 1.5, borderRadius: 12 } },
+      {
+        id: 'car_detail_spec_row',
+        type: 'row',
+        style: { gap: 6, marginTop: 12 },
+        children: [
+          { id: 'car_detail_spec_km', type: 'badge', props: { text: car.km } },
+          { id: 'car_detail_spec_fuel', type: 'badge', props: { text: car.fuel } },
+          { id: 'car_detail_spec_trans', type: 'badge', props: { text: car.transmission } },
+          { id: 'car_detail_spec_owner', type: 'badge', props: { text: '1st Owner' } },
+        ],
+      },
+      ...(car.badge
+        ? [{ id: 'car_detail_badge', type: 'badge', props: { text: car.badge, tone: 'info' }, style: { marginTop: 8 } } as Node]
+        : []),
+      { id: 'car_detail_title', type: 'text', props: { content: car.title }, style: { fontSize: 22, fontWeight: '700', marginTop: 8 } },
+      { id: 'car_detail_variant', type: 'text', props: { content: car.variant }, style: { color: '#6B7280', marginTop: 2 } },
+      {
+        id: 'car_detail_location_row',
+        type: 'row',
+        style: { gap: 6, align: 'center', marginTop: 8 },
+        children: [
+          { id: 'car_detail_location_icon', type: 'icon', props: { name: 'location-outline', size: 16 }, style: { color: '#6B7280' } },
+          { id: 'car_detail_location_text', type: 'text', props: { content: 'Udyog Vihar, Sector 18, Gurugram  |  2.2 km away' }, style: { color: '#6B7280', fontSize: 13 } },
+        ],
+      },
+      {
+        id: 'car_detail_feature_row',
+        type: 'row',
+        style: { gap: 6, marginTop: 12 },
+        children: [
+          { id: 'car_detail_feature_warranty', type: 'badge', props: { text: 'Lifetime warranty' } },
+          { id: 'car_detail_feature_return', type: 'badge', props: { text: '30 days return' } },
+          { id: 'car_detail_feature_checks', type: 'badge', props: { text: '300+ quality checks' } },
+        ],
+      },
+      {
+        id: 'car_detail_emi_box',
+        type: 'stack',
+        style: { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 16, marginTop: 16, gap: 4 },
+        children: [
+          { id: 'car_detail_emi_label', type: 'text', props: { content: 'EMI on Zero Downpayment' }, style: { color: '#6B7280', fontSize: 13 } },
+          { id: 'car_detail_emi_value', type: 'text', props: { content: `EMI ${car.emi}` }, style: { fontSize: 18, fontWeight: '700' } },
+        ],
+      },
+      {
+        id: 'car_detail_price_box',
+        type: 'stack',
+        style: { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 16, marginTop: 8, gap: 4 },
+        children: [
+          { id: 'car_detail_price_value', type: 'text', props: { content: car.price }, style: { fontSize: 20, fontWeight: '700' } },
+          { id: 'car_detail_price_caption', type: 'text', props: { content: '+ ₹36,000 other charges' }, style: { color: '#6B7280', fontSize: 12 } },
+        ],
+      },
+      {
+        id: 'car_detail_cta_row',
+        type: 'row',
+        style: { gap: 12, marginTop: 20 },
+        children: [
+          {
+            id: 'car_detail_book_now',
+            type: 'tappable',
+            onTap: { type: 'openSheet', sheet: 'booking', params: { listingId: car.id } },
+            children: [{ id: 'car_detail_book_now_btn', type: 'button', props: { label: 'Book now', variant: 'primary' }, style: { width: 160 } }],
+          },
+          {
+            id: 'car_detail_test_drive',
+            type: 'tappable',
+            onTap: { type: 'navigate', screen: 'test_drive', params: { listingId: car.id } },
+            children: [{ id: 'car_detail_test_drive_btn', type: 'button', props: { label: 'Free test drive', variant: 'secondary' }, style: { width: 160 } }],
+          },
+        ],
+      },
+    ],
+  };
+}
+
 export async function fetchScreenJson(screenId: string, params?: Record<string, string>): Promise<Screen> {
   // Artificial network-like delay so this is a genuine, isolable "fetch"
   // phase -- unlike the home screen's JSON, which is bundled locally via
@@ -131,5 +241,13 @@ export async function fetchScreenJson(screenId: string, params?: Record<string, 
   if (screenId === 'listing') {
     return buildListingScreen(params ?? {});
   }
+  if (screenId === 'car_detail') {
+    return buildCarDetailScreen(params?.listingId ?? '');
+  }
   throw new Error(`No mock screen registered for screenId "${screenId}"`);
 }
+
+// Screen ids this mock server can actually build JSON for. HomeScreen.tsx
+// uses this to decide between the real fetch-and-render path and the
+// generic "Screen: X" placeholder for destinations that were out of scope.
+export const REAL_SCREEN_IDS = new Set(['listing', 'car_detail']);

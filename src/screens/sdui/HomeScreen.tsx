@@ -7,7 +7,7 @@ import type { Screen } from '../../schema/types';
 import { mark } from '../../perf/timing';
 import { createFrameJankTracker } from '../../perf/scrollJank';
 import { runAfterPaint } from '../../perf/runAfterPaint';
-import { fetchScreenJson } from '../../server/mockServer';
+import { fetchScreenJson, REAL_SCREEN_IDS } from '../../server/mockServer';
 
 const screen = homeJsonRaw as unknown as Screen;
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
@@ -25,37 +25,36 @@ const jsonParseBenchMs = Date.now() - jsonParseBenchStart;
 
 const jank = createFrameJankTracker();
 
-// Real, param-driven destination for the "listing" navigate target: calls
-// the mock server (src/server/mockServer.ts) with the params carried by the
-// navigate action, shows a loading state while that's in flight (proving
-// this is a genuine async fetch, not an instant local lookup), then renders
-// the returned Screen through the exact same RenderNode/registry used for
-// the home screen. Different `category` params produce visibly different
-// results -- this is the thing that makes navigation "real" rather than a
-// pipe that only proves data arrived.
-function ListingDestination({ params }: { params?: Record<string, string> }) {
+// Real, param-driven destination for any navigate target the mock server
+// (src/server/mockServer.ts) knows how to build JSON for -- currently
+// "listing" (keyed by category) and "car_detail" (keyed by listingId).
+// Calls fetchScreenJson, shows a loading state while that's in flight
+// (proving this is a genuine async fetch, not an instant local lookup),
+// then renders the returned Screen through the exact same
+// RenderNode/registry used for the home screen. Different params produce
+// visibly different results -- this is what makes navigation "real" rather
+// than a pipe that only proves data arrived.
+function JsonDestination({ screenId, params }: { screenId: string; params?: Record<string, string> }) {
   const [screen, setScreen] = useState<Screen | null>(null);
   const paramsKey = JSON.stringify(params ?? {});
 
   useEffect(() => {
     let cancelled = false;
     setScreen(null);
-    fetchScreenJson('listing', params).then((s) => {
+    fetchScreenJson(screenId, params).then((s) => {
       if (!cancelled) setScreen(s);
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paramsKey]);
+  }, [screenId, paramsKey]);
 
   if (!screen) {
     return (
       <View style={{ padding: 16, alignItems: 'center', marginTop: 48 }}>
         <ActivityIndicator color="#4B3AF0" />
-        <Text style={{ marginTop: 12, color: '#6B7280' }}>
-          Fetching listing for "{params?.category ?? 'all'}"…
-        </Text>
+        <Text style={{ marginTop: 12, color: '#6B7280' }}>Fetching "{screenId}"…</Text>
       </View>
     );
   }
@@ -120,8 +119,8 @@ function HomeScreenInner() {
               <Text style={{ color: '#4B3AF0', fontWeight: '700', fontSize: 16 }}>{'< Back'}</Text>
             </Pressable>
           </View>
-          {top.screenId === 'listing' ? (
-            <ListingDestination params={top.params} />
+          {REAL_SCREEN_IDS.has(top.screenId) ? (
+            <JsonDestination screenId={top.screenId} params={top.params} />
           ) : (
             <View style={{ padding: 16 }}>
               <Text style={{ fontSize: 20, fontWeight: '700' }}>Screen: {top.screenId}</Text>
@@ -130,8 +129,8 @@ function HomeScreenInner() {
               )}
               <Text style={{ marginTop: 16, color: '#6B7280' }}>
                 Placeholder destination -- this proves the navigate action carries a screen id +
-                params straight from JSON. Only "home" and "listing" have real JSON built so far
-                (see the "listing" destination for a fully param-driven example).
+                params straight from JSON. Only "home", "listing", and "car_detail" have real JSON
+                built so far.
               </Text>
             </View>
           )}
