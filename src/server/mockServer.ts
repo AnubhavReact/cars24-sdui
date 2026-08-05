@@ -275,12 +275,20 @@ function buildGenericScreen(screenId: string, params?: Record<string, string>): 
     title,
     sections: [
       {
-        id: 'generic_icon',
-        type: 'icon',
-        props: { name: icon, size: 56 },
-        style: { color: '#4B3AF0', marginTop: 32 },
+        id: 'generic_banner',
+        type: 'image',
+        props: { uri: `https://picsum.photos/seed/dummy-${screenId}/900/560` },
+        style: { aspectRatio: 1.6, borderRadius: 16 },
       },
-      { id: 'generic_title', type: 'text', props: { content: title }, style: { fontSize: 22, fontWeight: '700', marginTop: 16 } },
+      {
+        id: 'generic_title_row',
+        type: 'row',
+        style: { gap: 10, align: 'center', marginTop: 16 },
+        children: [
+          { id: 'generic_icon', type: 'icon', props: { name: icon, size: 26 }, style: { color: '#4B3AF0' } },
+          { id: 'generic_title', type: 'text', props: { content: title }, style: { fontSize: 22, fontWeight: '700' } },
+        ],
+      },
       {
         id: 'generic_note',
         type: 'text',

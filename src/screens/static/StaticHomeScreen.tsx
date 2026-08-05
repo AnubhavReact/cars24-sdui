@@ -308,29 +308,32 @@ export function StaticHomeScreen() {
             <Pressable onPress={() => setNavScreen(null)} style={{ marginBottom: 8 }}>
               <Text style={{ color: '#4B3AF0', fontWeight: '700', fontSize: 16 }}>{'< Back'}</Text>
             </Pressable>
-            <View style={{ alignItems: 'center', marginTop: 24 }}>
+            <Image
+              source={{ uri: `https://picsum.photos/seed/dummy-${navScreen.id}/900/560` }}
+              style={{ width: '100%', aspectRatio: 1.6, borderRadius: 16, backgroundColor: '#E5E7EB' }}
+              resizeMode="cover"
+            />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 }}>
               <Ionicons
                 name={(NAV_SCREEN_ICONS[navScreen.id] ?? 'apps-outline') as keyof typeof Ionicons.glyphMap}
-                size={56}
+                size={26}
                 color="#4B3AF0"
               />
-              <Text style={{ fontSize: 22, fontWeight: '700', marginTop: 16 }}>
-                {humanizeScreenId(navScreen.id)}
-              </Text>
-              <Text style={{ color: '#6B7280', marginTop: 8, textAlign: 'center' }}>
-                Dummy content, hardcoded directly in this screen -- no JSON, no server call. That's
-                the point of the static twin: this is the zero-SDUI-overhead baseline.
-              </Text>
-              {navScreen.params && (
-                <View style={{ flexDirection: 'row', gap: 6, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  {Object.entries(navScreen.params).map(([key, value]) => (
-                    <View key={key} style={{ backgroundColor: '#EDE9FE', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
-                      <Text style={{ fontSize: 12, color: '#374151' }}>{key}: {value}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+              <Text style={{ fontSize: 22, fontWeight: '700' }}>{humanizeScreenId(navScreen.id)}</Text>
             </View>
+            <Text style={{ color: '#6B7280', marginTop: 8 }}>
+              Dummy content, hardcoded directly in this screen -- no JSON, no server call. That's
+              the point of the static twin: this is the zero-SDUI-overhead baseline.
+            </Text>
+            {navScreen.params && (
+              <View style={{ flexDirection: 'row', gap: 6, marginTop: 16, flexWrap: 'wrap' }}>
+                {Object.entries(navScreen.params).map(([key, value]) => (
+                  <View key={key} style={{ backgroundColor: '#EDE9FE', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
+                    <Text style={{ fontSize: 12, color: '#374151' }}>{key}: {value}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       )}
