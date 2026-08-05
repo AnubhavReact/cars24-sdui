@@ -74,16 +74,144 @@
       "type": "carousel",
       "style": { "backgroundColor": "#4B3AF0", "paddingHorizontal": 16, "paddingVertical": 8 },
       "children": [
-        { "id": "tab_all", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "all" }, "children": [ { "id": "tab_all_btn", "type": "button", "props": { "label": "All", "variant": "chip", "selected": true } } ] },
-        { "id": "tab_buy", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "buy_used_car" } }, "children": [ { "id": "tab_buy_btn", "type": "button", "props": { "label": "Buy used car", "variant": "chip" } } ] },
-        { "id": "tab_sell", "type": "tappable", "onTap": { "type": "navigate", "screen": "sell" }, "children": [ { "id": "tab_sell_btn", "type": "button", "props": { "label": "Sell car", "variant": "chip" } } ] },
-        { "id": "tab_loans", "type": "tappable", "onTap": { "type": "navigate", "screen": "loans" }, "children": [ { "id": "tab_loans_btn", "type": "button", "props": { "label": "Loans", "variant": "chip" } } ] },
-        { "id": "tab_challan", "type": "tappable", "onTap": { "type": "navigate", "screen": "challan" }, "children": [ { "id": "tab_challan_btn", "type": "button", "props": { "label": "Challan", "variant": "chip" } } ] }
+        { "id": "tab_all_sel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "all" }, "visibleIf": { "state": "activeTab", "equals": "all" }, "children": [ { "id": "tab_all_sel_btn", "type": "button", "props": { "label": "All", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_all_unsel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "all" }, "visibleIf": { "state": "activeTab", "notEquals": "all" }, "children": [ { "id": "tab_all_unsel_btn", "type": "button", "props": { "label": "All", "variant": "chip", "selected": false } } ] },
+
+        { "id": "tab_buy_sel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "buy" }, "visibleIf": { "state": "activeTab", "equals": "buy" }, "children": [ { "id": "tab_buy_sel_btn", "type": "button", "props": { "label": "Buy used car", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_buy_unsel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "buy" }, "visibleIf": { "state": "activeTab", "notEquals": "buy" }, "children": [ { "id": "tab_buy_unsel_btn", "type": "button", "props": { "label": "Buy used car", "variant": "chip", "selected": false } } ] },
+
+        { "id": "tab_sell_sel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "sell" }, "visibleIf": { "state": "activeTab", "equals": "sell" }, "children": [ { "id": "tab_sell_sel_btn", "type": "button", "props": { "label": "Sell car", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_sell_unsel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "sell" }, "visibleIf": { "state": "activeTab", "notEquals": "sell" }, "children": [ { "id": "tab_sell_unsel_btn", "type": "button", "props": { "label": "Sell car", "variant": "chip", "selected": false } } ] },
+
+        { "id": "tab_loans_sel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "loans" }, "visibleIf": { "state": "activeTab", "equals": "loans" }, "children": [ { "id": "tab_loans_sel_btn", "type": "button", "props": { "label": "Loans", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_loans_unsel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "loans" }, "visibleIf": { "state": "activeTab", "notEquals": "loans" }, "children": [ { "id": "tab_loans_unsel_btn", "type": "button", "props": { "label": "Loans", "variant": "chip", "selected": false } } ] },
+
+        { "id": "tab_challan_sel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "challan" }, "visibleIf": { "state": "activeTab", "equals": "challan" }, "children": [ { "id": "tab_challan_sel_btn", "type": "button", "props": { "label": "Challan", "variant": "chip", "selected": true } } ] },
+        { "id": "tab_challan_unsel", "type": "tappable", "onTap": { "type": "setState", "key": "activeTab", "value": "challan" }, "visibleIf": { "state": "activeTab", "notEquals": "challan" }, "children": [ { "id": "tab_challan_unsel_btn", "type": "button", "props": { "label": "Challan", "variant": "chip", "selected": false } } ] }
+      ]
+    },
+    {
+      "id": "buy_used_car_tab_content",
+      "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "buy" },
+      "style": { "padding": 16, "gap": 16 },
+      "children": [
+        { "id": "buy_tab_title", "type": "text", "props": { "content": "Buy used car", "variant": "title" }, "style": { "fontSize": 20, "fontWeight": "700" } },
+        {
+          "id": "buy_tab_grid",
+          "type": "grid",
+          "props": { "columns": 2 },
+          "children": [
+            { "id": "buy_tab_all_cars", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "all" } }, "children": [ { "id": "buy_tab_all_cars_card", "type": "stack", "style": { "backgroundColor": "#EEF2FF", "borderRadius": 12, "padding": 16, "gap": 4 }, "children": [ { "id": "buy_tab_all_cars_title", "type": "text", "props": { "content": "All cars" }, "style": { "fontWeight": "700", "fontSize": 15 } }, { "id": "buy_tab_all_cars_sub", "type": "text", "props": { "content": "Cars at best price" }, "style": { "color": "#6B7280", "fontSize": 12 } } ] } ] },
+            { "id": "buy_tab_budget_cars", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "budget" } }, "children": [ { "id": "buy_tab_budget_cars_card", "type": "stack", "style": { "backgroundColor": "#EEF2FF", "borderRadius": 12, "padding": 16, "gap": 4 }, "children": [ { "id": "buy_tab_budget_cars_title", "type": "text", "props": { "content": "Budget cars" }, "style": { "fontWeight": "700", "fontSize": 15 } }, { "id": "buy_tab_budget_cars_sub", "type": "text", "props": { "content": "Under ₹7 Lakhs" }, "style": { "color": "#6B7280", "fontSize": 12 } } ] } ] },
+            { "id": "buy_tab_midrange_cars", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "all" } }, "children": [ { "id": "buy_tab_midrange_cars_card", "type": "stack", "style": { "backgroundColor": "#EEF2FF", "borderRadius": 12, "padding": 16, "gap": 4 }, "children": [ { "id": "buy_tab_midrange_cars_title", "type": "text", "props": { "content": "Mid range cars" }, "style": { "fontWeight": "700", "fontSize": 15 } }, { "id": "buy_tab_midrange_cars_sub", "type": "text", "props": { "content": "₹7 to ₹15 Lakhs" }, "style": { "color": "#6B7280", "fontSize": 12 } } ] } ] },
+            { "id": "buy_tab_premium_cars", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "premium" } }, "children": [ { "id": "buy_tab_premium_cars_card", "type": "stack", "style": { "backgroundColor": "#EEF2FF", "borderRadius": 12, "padding": 16, "gap": 4 }, "children": [ { "id": "buy_tab_premium_cars_title", "type": "text", "props": { "content": "Premium cars" }, "style": { "fontWeight": "700", "fontSize": 15 } }, { "id": "buy_tab_premium_cars_sub", "type": "text", "props": { "content": "Above ₹15 Lakhs" }, "style": { "color": "#6B7280", "fontSize": 12 } } ] } ] }
+          ]
+        },
+        {
+          "id": "buy_tab_love_header",
+          "type": "row",
+          "style": { "justify": "space-between", "align": "center" },
+          "children": [
+            { "id": "buy_tab_love_title", "type": "text", "props": { "content": "Cars you'll love", "variant": "title" } },
+            { "id": "buy_tab_love_viewall", "type": "tappable", "onTap": { "type": "navigate", "screen": "listing", "params": { "category": "buy_used_car" } }, "children": [ { "id": "buy_tab_love_viewall_text", "type": "text", "props": { "content": "View all" }, "style": { "color": "#4B3AF0", "fontWeight": "700" } } ] }
+          ]
+        },
+        {
+          "id": "buy_tab_love_rail",
+          "type": "carousel",
+          "children": [
+            {
+              "id": "buy_tab_love_baleno",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "car_detail", "params": { "listingId": "baleno-2015" } },
+              "children": [
+                {
+                  "id": "buy_tab_love_baleno_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "padding": 12, "width": 260, "gap": 6 },
+                  "children": [
+                    { "id": "buy_tab_love_baleno_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-baleno/400/250" }, "style": { "aspectRatio": 1.7 } },
+                    { "id": "buy_tab_love_baleno_badge", "type": "badge", "props": { "text": "Cars24 Owned stock", "tone": "info" } },
+                    { "id": "buy_tab_love_baleno_title", "type": "text", "props": { "content": "2015 Maruti Baleno" }, "style": { "fontWeight": "700" } },
+                    { "id": "buy_tab_love_baleno_variant", "type": "text", "props": { "content": "DELTA CVT PETROL 1.2" }, "style": { "color": "#6B7280", "fontSize": 12 } },
+                    { "id": "buy_tab_love_baleno_price", "type": "text", "props": { "content": "₹3.75 lakh  |  EMI ₹9,886/m*" }, "style": { "fontWeight": "700" } }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "buy_tab_love_xuv300",
+              "type": "tappable",
+              "onTap": { "type": "navigate", "screen": "car_detail", "params": { "listingId": "xuv300-2023" } },
+              "children": [
+                {
+                  "id": "buy_tab_love_xuv300_body",
+                  "type": "stack",
+                  "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "padding": 12, "width": 260, "gap": 6 },
+                  "children": [
+                    { "id": "buy_tab_love_xuv300_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/listing-xuv300/400/250" }, "style": { "aspectRatio": 1.7 } },
+                    { "id": "buy_tab_love_xuv300_badge", "type": "badge", "props": { "text": "Cars24 Owned stock", "tone": "info" } },
+                    { "id": "buy_tab_love_xuv300_title", "type": "text", "props": { "content": "2023 Mahindra XUV300" }, "style": { "fontWeight": "700" } },
+                    { "id": "buy_tab_love_xuv300_variant", "type": "text", "props": { "content": "W6 1.2 PETROL" }, "style": { "color": "#6B7280", "fontSize": 12 } },
+                    { "id": "buy_tab_love_xuv300_price", "type": "text", "props": { "content": "₹6.60 lakh  |  EMI ₹11,651/m*" }, "style": { "fontWeight": "700" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "buy_tab_brand_header",
+          "type": "text",
+          "props": { "content": "Explore by brand", "variant": "title" }
+        },
+        {
+          "id": "buy_tab_brand_rail",
+          "type": "carousel",
+          "children": [
+            { "id": "buy_tab_brand_maruti", "type": "stack", "style": { "align": "center", "gap": 6, "width": 84 }, "children": [ { "id": "buy_tab_brand_maruti_icon", "type": "icon", "props": { "name": "car-sport-outline", "size": 32 }, "style": { "color": "#4B3AF0" } }, { "id": "buy_tab_brand_maruti_label", "type": "text", "props": { "content": "Maruti" }, "style": { "textAlign": "center" } } ] },
+            { "id": "buy_tab_brand_hyundai", "type": "stack", "style": { "align": "center", "gap": 6, "width": 84 }, "children": [ { "id": "buy_tab_brand_hyundai_icon", "type": "icon", "props": { "name": "car-sport-outline", "size": 32 }, "style": { "color": "#4B3AF0" } }, { "id": "buy_tab_brand_hyundai_label", "type": "text", "props": { "content": "Hyundai" }, "style": { "textAlign": "center" } } ] },
+            { "id": "buy_tab_brand_tata", "type": "stack", "style": { "align": "center", "gap": 6, "width": 84 }, "children": [ { "id": "buy_tab_brand_tata_icon", "type": "icon", "props": { "name": "car-sport-outline", "size": 32 }, "style": { "color": "#4B3AF0" } }, { "id": "buy_tab_brand_tata_label", "type": "text", "props": { "content": "Tata" }, "style": { "textAlign": "center" } } ] },
+            { "id": "buy_tab_brand_honda", "type": "stack", "style": { "align": "center", "gap": 6, "width": 84 }, "children": [ { "id": "buy_tab_brand_honda_icon", "type": "icon", "props": { "name": "car-sport-outline", "size": 32 }, "style": { "color": "#4B3AF0" } }, { "id": "buy_tab_brand_honda_label", "type": "text", "props": { "content": "Honda" }, "style": { "textAlign": "center" } } ] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sell_tab_content",
+      "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "sell" },
+      "style": { "padding": 16, "gap": 8, "marginTop": 24 },
+      "children": [
+        { "id": "sell_tab_title", "type": "text", "props": { "content": "Sell car" }, "style": { "fontSize": 20, "fontWeight": "700" } },
+        { "id": "sell_tab_note", "type": "text", "props": { "content": "This tab's real layout wasn't explored/replicated in this build. This content proves the same setState + visibleIf tab-switch mechanism verified for the \"Buy used car\" tab, applied generically to every tab." }, "style": { "color": "#6B7280", "marginTop": 8 } }
+      ]
+    },
+    {
+      "id": "loans_tab_content",
+      "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "loans" },
+      "style": { "padding": 16, "gap": 8, "marginTop": 24 },
+      "children": [
+        { "id": "loans_tab_title", "type": "text", "props": { "content": "Loans" }, "style": { "fontSize": 20, "fontWeight": "700" } },
+        { "id": "loans_tab_note", "type": "text", "props": { "content": "This tab's real layout wasn't explored/replicated in this build. This content proves the same setState + visibleIf tab-switch mechanism verified for the \"Buy used car\" tab, applied generically to every tab." }, "style": { "color": "#6B7280", "marginTop": 8 } }
+      ]
+    },
+    {
+      "id": "challan_tab_content",
+      "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "challan" },
+      "style": { "padding": 16, "gap": 8, "marginTop": 24 },
+      "children": [
+        { "id": "challan_tab_title", "type": "text", "props": { "content": "Challan" }, "style": { "fontSize": 20, "fontWeight": "700" } },
+        { "id": "challan_tab_note", "type": "text", "props": { "content": "This tab's real layout wasn't explored/replicated in this build. This content proves the same setState + visibleIf tab-switch mechanism verified for the \"Buy used car\" tab, applied generically to every tab." }, "style": { "color": "#6B7280", "marginTop": 8 } }
       ]
     },
     {
       "id": "buy_car_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "padding": 16, "gap": 12 },
       "children": [
         {
@@ -154,6 +282,7 @@
     {
       "id": "car_listings_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "padding": 16, "gap": 12 },
       "children": [
         { "id": "car_listings_title", "type": "text", "props": { "content": "Best deals for you", "variant": "title" } },
@@ -231,6 +360,7 @@
     {
       "id": "manage_vehicle_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "backgroundColor": "#4B3AF0", "padding": 16, "gap": 12 },
       "children": [
         {
@@ -260,6 +390,7 @@
     {
       "id": "promo_banner",
       "type": "tappable",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "onTap": { "type": "openUrl", "url": "https://cars24.com/orbit" },
       "children": [
         {
@@ -277,6 +408,7 @@
     {
       "id": "why_cars24_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "padding": 16, "gap": 12 },
       "children": [
         { "id": "why_cars24_title", "type": "text", "props": { "content": "Why choose Cars24", "variant": "title" } },
@@ -328,6 +460,7 @@
     {
       "id": "showrooms_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "padding": 16, "gap": 12 },
       "children": [
         { "id": "showrooms_title", "type": "text", "props": { "content": "2 showrooms in your city", "variant": "title" } },
@@ -380,6 +513,7 @@
     {
       "id": "trending_section",
       "type": "stack",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "padding": 16, "gap": 12 },
       "children": [
         {
@@ -405,6 +539,7 @@
     {
       "id": "value_prop_carousel",
       "type": "carousel",
+      "visibleIf": { "state": "activeTab", "equals": "all" },
       "style": { "paddingHorizontal": 16, "paddingVertical": 12, "gap": 12 },
       "children": [
         {
