@@ -50,13 +50,18 @@ documented cut, not an oversight.
 
 `navigate | openUrl | openSheet | call | setState | toggleState | composite`
 
-The real app's category tabs turned out to **navigate** to a new screen
-rather than filter in place (confirmed by tapping it live in the emulator —
-see `docs/screen-inventory.md`). `setState`/`toggleState` are kept in the
-schema anyway because they're the general mechanism for the brief's
-"tab/chip selection that changes content" pattern (paired with `visibleIf`
-conditionals) — used for the "All" tab's selected-chip styling, and available
-for any future in-place-filtering UI.
+The real app's category tabs are an **in-place content swap**, not a
+navigation — confirmed by tapping precisely (via exact `uiautomator`
+bounds) live in the emulator, see `docs/screen-inventory.md`. An earlier,
+imprecisely-tapped exploration wrongly concluded tabs navigate; that was
+caught and corrected. `setState` + `visibleIf` is the mechanism used for
+this: every tab is a pair of selected/unselected variants (same pattern as
+the favorite-heart `toggleState` demo), and every "All tab"-only section
+carries `visibleIf: {state: activeTab, equals: 'all'}`. `navigate` is still
+used separately for the "listing" destination reached from the "Buy car"
+rail cards and the "Buy used car" tab's own internal category grid, which
+is a genuine screen change with its own back stack — the two patterns
+coexist because the real app uses both, for different interactions.
 
 ## Conditionals
 

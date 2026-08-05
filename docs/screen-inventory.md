@@ -27,12 +27,23 @@ strong candidate for the required SDUI-driven interactive element.
 
 ## Findings from live exploration (real app, via emulator + adb)
 
-- **Category tabs navigate, they don't filter in place.** Tapping "Buy used
-  car" on the home page pushes a full listing/search screen (filters, sort,
-  budget chips, results count, car cards with "Free Test Drive" / "View
-  Details"). So the tab selector is a `navigate` action, not an in-place
-  content swap — model it that way in the schema (an action with a
-  `navigate` type + target screen id, not a conditional-render toggle).
+- **CORRECTED finding: category tabs swap content in place; they do not
+  navigate.** The original note here said tabs `navigate` to a full
+  listing/search screen. That was wrong -- it was based on an imprecise,
+  eyeballed tap coordinate (before this build adopted the discipline of
+  reading exact bounds via `adb shell uiautomator dump` for every tap),
+  which almost certainly missed the tab and landed on a neighboring
+  element instead. Re-verified carefully with exact bounds
+  (`content-desc="Buy used car"`, clickable area `[226,424][528,614]`):
+  tapping "Buy used car" keeps the header, tab bar, and bottom nav all
+  identical, and only swaps the body content below the tabs (a 2x2
+  category grid + a "Cars you'll love" rail + "Explore by brand" +
+  "Buy used cars by body type"). This is the brief's own literal example
+  of the required interactive element ("a tab/chip selection that changes
+  content") -- modeled with `setState` + `visibleIf`, not `navigate`.
+  Caught by the user reviewing the running app and flagging the
+  discrepancy against the real Cars24 app, not caught internally --
+  logged in `AI_WORKFLOW.md`.
 - The listing screen -> car detail screen is a good candidate for the
   "different screen" surprise test in round 1: it reuses some patterns (car
   card) but adds new ones (image carousel with tabs, EMI/price block, sticky
@@ -41,7 +52,7 @@ strong candidate for the required SDUI-driven interactive element.
   these screens as tested — "Check eligibility" on the car detail page
   bounced back without showing a sheet (likely gated behind login). Not
   chasing this further; per the brief this was only an example ("e.g.") of
-  a valid interactive action. **Decision: use the category-tab
-  navigation action (or an equivalent chip/tab selection with visible
-  content change) as our required SDUI-driven interactive element**, and
-  note this substitution explicitly in the README.
+  a valid interactive action. **Decision: use the category-tab selection
+  (now correctly modeled as an in-place content swap, see above) as our
+  required SDUI-driven interactive element**, and note this substitution
+  explicitly in the README.

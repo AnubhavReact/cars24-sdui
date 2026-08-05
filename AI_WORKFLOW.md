@@ -10,16 +10,17 @@
 - **Android Studio emulator** (Pixel_7 AVD, Android 16) as the only device
   used -- no physical device was available this session (see `PERF.md`'s
   methodology caveat).
-- Working mode was mostly **high-level direction + autonomous execution**,
-  not a rapid prompt-by-prompt chat loop: the user set the goal and
-  approved checkpoints (schema design, then renderer, then perf, etc.);
-  most implementation decisions, live-device verification, and bug-catching
-  happened inside a single agentic turn rather than through many small
-  back-and-forth prompts. That shapes the "prompt → outcome" stories below
-  differently from a typical copy-paste-into-chat workflow: the interesting
-  moments are less "I rejected what the AI typed" and more "the AI's first
-  approach was wrong and live testing against the real emulator caught it
-  before it shipped."
+- Working mode was mostly **high-level direction + autonomous execution**
+  for implementation (the user set the goal and approved checkpoints --
+  schema design, then renderer, then perf, etc. -- while most
+  moment-to-moment code and live-device verification happened inside
+  agentic turns), **plus direct user QA against the real app**, which is
+  where the sharpest correction in this build came from (see story #3
+  below): the user installed and used the actual Cars24 app themselves,
+  found a place where this build's behavior didn't match it, and rejected
+  a shipped design decision directly. That combination -- AI executing
+  fast, human verifying against ground truth the AI didn't check carefully
+  enough -- is the pattern this whole workflow leaned on.
 
 ## Context / rules files
 
@@ -80,21 +81,31 @@ than silently picking whichever number looked better.
 
 ### 3. Schema design: rejected the "one component per section" default
 
-**What happened:** When designing the JSON schema against the 13-section
-home-page inventory, the path of least resistance -- and the one most
-SDUI-tutorial examples default to -- is one component type per visual
-section: `carCard`, `loanRail`, `showroomCard`, etc. That would have been
-faster to author for this one screen.
+**What happened:** Early in the build, I (Claude) explored the real Cars24
+app to decide how the category tabs should behave, and tapped "Buy used
+car" using a raw eyeballed screenshot coordinate (before this session
+adopted the discipline of reading exact bounds via `adb shell uiautomator
+dump` for every tap). That tap landed on a full listing/search screen, so I
+concluded the tabs `navigate` to a new screen, and built the whole action
+around that: `navigate` carrying a `category` param, later extended into
+the param-driven "listing" destination screen.
 
-**What was rejected and why:** I explicitly reasoned through the brief's
-round-1 test (a screen this system wasn't built for, judged on % rendered
-with JSON-only changes) and concluded a per-section registry would score
-near-zero on that test, since every new visual shape would need a new
-component type. Rewrote the design around ~13 generic layout/content
-primitives (`stack`/`row`/`carousel`/`grid`/`list` +
-`text`/`image`/`icon`/`badge`/`button`/`divider`/`spacer` + `tappable`)
-that compose to produce every section instead, accepting more verbose JSON
-payloads as the trade-off. Full reasoning in `docs/SCHEMA.md`.
+**What the user rejected and why:** After the app was working end-to-end,
+the user reviewed the running app against the real Cars24 app themselves
+and flagged it directly: *"buy used car me navigation nhi hai sirf tab
+switch hai actual cars24 me"* -- there's no navigation for "Buy used car,"
+it's just a tab switch in the actual app. This was a real prompt catching a
+real, shipped, wrong design decision -- not something I caught myself. I
+re-verified by relaunching the real app fresh and tapping the tab using
+exact bounds from `uiautomator dump` (`clickable area [226,424][528,614]`,
+center far from my original guess), and the user was right: header, tab
+bar, and bottom nav all stay identical, only the body content swaps.
+Reworked `category_tabs` from `navigate` to `setState` + `visibleIf`
+(reusing the same selected/unselected pattern already proven by the
+favorite-heart toggle), gated every "All tab" section behind
+`visibleIf: activeTab == 'all'`, and built a real "Buy used car" tab body
+matching the verified real layout (2x2 category grid + a car rail).
+Full trail in `docs/screen-inventory.md`.
 
 ## One AI failure
 

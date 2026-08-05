@@ -9,7 +9,7 @@ per-screen. Built in React Native (Expo, TypeScript).
 **The Cars24 home/landing page**, as suggested by the brief. Explored the
 real app on an Android emulator (see `docs/screen-inventory.md` and
 `docs/reference-screenshots/`) and inventoried **13 visually distinct
-section types**: header/search, a navigating tab selector, five horizontal
+section types**: header/search, an in-place tab selector, five horizontal
 rails (buy-car categories, car listings, showrooms, trending new cars,
 marketing banners), a 2×3 grid, a promo banner, and a footer. That's well
 past the brief's 5-section bar, includes both a rail and a grid, and the tab
@@ -115,12 +115,17 @@ scoped out here as a documented cut, not an oversight.
 
 **Actions ended up as `navigate | openUrl | openSheet | call | setState |
 toggleState | composite`** -- discovered empirically, not designed in
-isolation: tapping the real app's category tabs live in the emulator showed
-they navigate to a new screen rather than filtering in place, so `navigate`
-carrying a `screen` id + `params` had to be the primary mechanism, with
-`setState`/`toggleState` kept for the general "chip selection changes
-content in place" pattern the brief describes (used for the "All" tab's
-selected-chip styling).
+isolation, and corrected empirically too: an early, imprecisely-tapped
+exploration of the real app wrongly concluded the category tabs `navigate`
+to a new screen; re-testing with exact tap coordinates showed they swap
+body content in place while the header/tab bar/bottom nav stay constant
+(see `docs/screen-inventory.md` and the AI-failure writeup in
+`AI_WORKFLOW.md`). So `setState` + `visibleIf` -- the general "chip
+selection changes content in place" mechanism the brief itself describes
+-- is what drives every tab, not `navigate`. `navigate` is still the real
+mechanism for genuine screen changes: the "listing" destination reached
+from the "Buy car" rail cards and from the "Buy used car" tab's own
+category grid.
 
 **Styling overrides** are a single flat `StyleProps` object on every node
 (`backgroundColor`, spacing, radius, typography, flex alignment), applied
@@ -171,9 +176,11 @@ section in your README is enough" allowance.
 - **The brief's tenure-selector → EMI example isn't on this page as-is.**
   Confirmed live on the real app (see `docs/screen-inventory.md`) -- "Check
   eligibility" on the car-detail page needs login before showing anything.
-  Substituted the tab/chip navigation as the required SDUI-driven
+  Substituted the tab/chip selection as the required SDUI-driven
   interactive element instead, since it's a real, observed pattern rather
-  than a fabricated one.
+  than a fabricated one -- and (after a correction, see `AI_WORKFLOW.md`)
+  it's modeled as the in-place content swap it actually is in the real
+  app, using `setState` + `visibleIf`.
 - **Perf measurement is n=3/n=4 samples on an emulator**, not a physical
   device across dozens of runs. Stated as a limitation in `PERF.md`, not
   hidden.
