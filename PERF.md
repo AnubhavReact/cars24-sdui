@@ -75,3 +75,39 @@ Static and SDUI and correctly excluded from the "SDUI overhead" number.
    the honest move given the 8-10hr budget was to report it clearly with a
    named next step (APK size diff + systrace) rather than either hide it or
    guess at a fix without evidence.
+3. **Found and fixed a repeat-navigation latency bug -- caught by manual
+   testing against the real app, not by the automated perf harness above.**
+   Every `navigate` in the SDUI screen goes through a mock server with a
+   simulated 450ms network delay (`src/server/mockServer.ts`). The
+   destination screen was written to reset to a loading spinner on *every*
+   navigation, including repeat visits to a screen+params combination
+   already fetched earlier in the session -- so reopening the same car
+   detail page a second time replayed the full 450ms wait and spinner
+   again, every time.
+
+   This was caught by directly comparing against the real Cars24 app: a
+   car detail page there shows a skeleton on first visit, then opens
+   *instantly* on a revisit (revalidating in the background, no visible
+   loading state) -- confirmed live, screenshotted, timed. Our app didn't
+   do this.
+
+   **Fix:** an in-memory stale-while-revalidate cache
+   (`src/server/screenCache.ts`), keyed by `screenId + params`. First
+   visit to a given screen+params: show the loading state, fetch, cache
+   the result. Every later visit to the *same* screen+params: render the
+   cached `Screen` JSON immediately (no loading state at all), while a
+   fresh fetch still happens invisibly behind it and refreshes the cache
+   for next time.
+
+   **Before/after, measured:** cold navigation to a car detail page took
+   the full ~450ms simulated fetch, with a spinner visible for that
+   duration. After the fix, a repeat visit to the same car renders fully
+   populated content within ~150ms of the tap (screenshotted at a 150ms
+   delay after `input tap`, before the simulated fetch would even
+   resolve) -- confirmed the fast path is the cache hit, not luck, since
+   150ms is well under the 450ms fetch time. Not a rigorous multi-sample
+   timing (this was a manual-testing catch, not a run through the
+   `mark()`/`adb logcat` harness used for the cold-start numbers above),
+   but the qualitative result -- zero perceived loading on revisit,
+   matching the real app -- is unambiguous and was directly verified, not
+   assumed.
