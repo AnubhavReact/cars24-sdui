@@ -8,7 +8,7 @@
 | `row` | layout | `wrap?` | horizontal linear layout of children, no scroll |
 | `carousel` | layout | `showsIndicator?` | horizontal scrollable rail -- every rail on the home page (Buy car, car listings, showrooms, trending, value-prop banners) is this one type |
 | `grid` | layout | `columns` | n-column grid -- "Manage your vehicle" |
-| `list` | layout | -- | vertical scrollable list (registered, not exercised by this particular screen -- see note below) |
+| `list` | layout | -- | vertical scrollable list -- "Why choose Cars24" |
 | `text` | content | `content`, `variant?`, `numberOfLines?` | |
 | `image` | content | `uri`, `resizeMode?` | |
 | `icon` | content | `name` (Ionicons), `size?` | |
@@ -23,10 +23,10 @@ home page (see `docs/screen-inventory.md`) is composed from this same set.
 
 ## Patterns supported
 
-- [x] Lists / grids -- `grid` (2D wrap), `list` (registered; the page uses `carousel`+page-scroll instead of `list` because every "list-like" section here is horizontal, but `list` renders through the identical code path as `stack`/`carousel` in `Renderer.tsx`, so it's exercised by construction, not a separate untested path)
+- [x] Lists / grids -- `grid` ("Manage your vehicle"), `list` ("Why choose Cars24")
 - [x] Carousels/rails -- `carousel`, used 6 times (category tabs, buy-car rail, car listings, showrooms, trending, value-prop banners)
 - [x] Conditionals -- `visibleIf` (`equals`/`notEquals`/`and`/`or`), demonstrated by the "All" tab's selected-chip styling
-- [x] Actions -- all 6 action types demonstrated on the home screen: `navigate` (tabs, cards, CTAs), `openSheet` (location picker), `openUrl` (promo banner), `call` (showroom "Call us now"), `setState` (tab selection), and `toggleState`/`composite` implemented in the dispatcher though not yet exercised by a home-screen node
+- [x] Actions -- 6 of 7 action types demonstrated live on the home screen: `navigate` (tabs, cards, CTAs), `openSheet` (location picker), `openUrl` (promo banner), `call` (showroom "Call us now"), `setState` (tab selection), `toggleState` (car-card favorite heart, paired with `visibleIf` to swap the outline/filled icon). `composite` (run several actions from one tap) is implemented in the dispatcher but has no home-screen use case that needs it yet -- kept simple rather than forced.
 - [x] Styling overrides -- every node's `style` (color, spacing, radius, sizing, typography, flex alignment) is applied generically by the renderer, not per-type
 - [x] Unknown-component fallback -- `video_carousel` node (unregistered type) and `ar_preview_banner` node (`minVersion: 2`, newer than this client) both degrade to the same silent-in-prod / labeled-in-dev fallback, proving both degrade paths independently
 - [x] Versioning -- `minVersion` on a node + `CLIENT_SCHEMA_VERSION` in the client; see `README.md` for the full story

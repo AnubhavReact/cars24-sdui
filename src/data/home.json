@@ -172,6 +172,31 @@
                   "style": { "backgroundColor": "#FFFFFF", "borderWidth": 1, "borderColor": "#E5E7EB", "borderRadius": 12, "padding": 12, "width": 280, "gap": 6 },
                   "children": [
                     { "id": "car_baleno_image", "type": "image", "props": { "uri": "https://picsum.photos/seed/cars24-baleno/400/250" }, "style": { "aspectRatio": 1.7 } },
+                    {
+                      "id": "car_baleno_fav_row",
+                      "type": "row",
+                      "style": { "justify": "flex-end" },
+                      "children": [
+                        {
+                          "id": "car_baleno_fav_outline",
+                          "type": "tappable",
+                          "onTap": { "type": "toggleState", "key": "favBaleno" },
+                          "visibleIf": { "state": "favBaleno", "notEquals": true },
+                          "children": [
+                            { "id": "car_baleno_fav_outline_icon", "type": "icon", "props": { "name": "heart-outline", "size": 22 }, "style": { "color": "#6B7280" } }
+                          ]
+                        },
+                        {
+                          "id": "car_baleno_fav_filled",
+                          "type": "tappable",
+                          "onTap": { "type": "toggleState", "key": "favBaleno" },
+                          "visibleIf": { "state": "favBaleno", "equals": true },
+                          "children": [
+                            { "id": "car_baleno_fav_filled_icon", "type": "icon", "props": { "name": "heart", "size": 22 }, "style": { "color": "#DC2626" } }
+                          ]
+                        }
+                      ]
+                    },
                     { "id": "car_baleno_stock_badge", "type": "badge", "props": { "text": "Cars24 Owned stock", "tone": "info" } },
                     { "id": "car_baleno_title", "type": "text", "props": { "content": "2015 Maruti Baleno", "variant": "subtitle" }, "style": { "fontWeight": "700" } },
                     { "id": "car_baleno_variant", "type": "text", "props": { "content": "DELTA CVT PETROL 1.2", "variant": "caption" } },
@@ -245,6 +270,57 @@
             { "id": "promo_banner_title", "type": "text", "props": { "content": "Add your car to Orbit", "variant": "title" }, "style": { "color": "#FFFFFF" } },
             { "id": "promo_banner_subtitle", "type": "text", "props": { "content": "Enjoy 3-months Spotify Premium free", "variant": "body" }, "style": { "color": "#D1E7DD" } },
             { "id": "promo_banner_cta", "type": "button", "props": { "label": "Add car now", "variant": "secondary" } }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "why_cars24_section",
+      "type": "stack",
+      "style": { "padding": 16, "gap": 12 },
+      "children": [
+        { "id": "why_cars24_title", "type": "text", "props": { "content": "Why choose Cars24", "variant": "title" } },
+        {
+          "id": "why_cars24_list",
+          "type": "list",
+          "style": { "gap": 14 },
+          "children": [
+            {
+              "id": "why_item_checks",
+              "type": "row",
+              "style": { "gap": 12, "align": "center" },
+              "children": [
+                { "id": "why_item_checks_icon", "type": "icon", "props": { "name": "checkmark-circle-outline", "size": 24 }, "style": { "color": "#16A34A" } },
+                { "id": "why_item_checks_text", "type": "text", "props": { "content": "300+ quality checks on every car" }, "style": { "fontSize": 15 } }
+              ]
+            },
+            {
+              "id": "why_item_warranty",
+              "type": "row",
+              "style": { "gap": 12, "align": "center" },
+              "children": [
+                { "id": "why_item_warranty_icon", "type": "icon", "props": { "name": "shield-checkmark-outline", "size": 24 }, "style": { "color": "#16A34A" } },
+                { "id": "why_item_warranty_text", "type": "text", "props": { "content": "Lifetime warranty on eligible cars" }, "style": { "fontSize": 15 } }
+              ]
+            },
+            {
+              "id": "why_item_return",
+              "type": "row",
+              "style": { "gap": 12, "align": "center" },
+              "children": [
+                { "id": "why_item_return_icon", "type": "icon", "props": { "name": "refresh-circle-outline", "size": 24 }, "style": { "color": "#16A34A" } },
+                { "id": "why_item_return_text", "type": "text", "props": { "content": "30-day money-back return policy" }, "style": { "fontSize": 15 } }
+              ]
+            },
+            {
+              "id": "why_item_rc",
+              "type": "row",
+              "style": { "gap": 12, "align": "center" },
+              "children": [
+                { "id": "why_item_rc_icon", "type": "icon", "props": { "name": "document-text-outline", "size": 24 }, "style": { "color": "#16A34A" } },
+                { "id": "why_item_rc_text", "type": "text", "props": { "content": "Free RC transfer, handled end-to-end" }, "style": { "fontSize": 15 } }
+              ]
+            }
           ]
         }
       ]
