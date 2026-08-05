@@ -161,3 +161,20 @@ reviewing AI-written UI code.
   in both directions: visible dev-mode placeholder in a debug build,
   confirmed silent (no crash, no visible artifact) in the actual release
   build used for perf measurement.
+- **A visual assumption was proven wrong with pixel data, not eyeballing.**
+  Building the `car_detail` screen, the CTA buttons and a badge looked
+  visually like plain unstyled text instead of colored pills -- easy to
+  second-guess as "maybe that's just how the screenshot compressed." Instead
+  of trusting the eyeball read, I sampled actual pixel RGB values at the
+  button's exact `uiautomator`-reported bounds with Pillow: pure white/light
+  gray, no blue anywhere the variant's `#4B3AF0` background should have
+  been. That confirmed a real bug rather than a rendering-quality artifact,
+  and pointed straight at `styleUtils.ts`: `toViewStyle`/`toTextStyle`
+  always returned every style key, including explicit `undefined` for
+  anything unset -- which, merged into a style array like
+  `[base, variantStyle, style]`, overwrites the variant's default styling
+  the moment a node sets any unrelated custom style property (this
+  specific case: a button given `width: 160`, or a badge given
+  `marginTop: 8`). Fixed at the root by stripping undefined keys before
+  returning, and then grepped the rest of `home.json` to confirm no
+  already-shipped node had silently hit the same bug.

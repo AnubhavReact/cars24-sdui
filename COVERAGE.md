@@ -57,15 +57,31 @@ if that prop is added) -- with the clearest gap being the image-carousel
 with tab strip (Exterior/Interior/Features/Highlights/Tyres) on the car
 detail page, which is a new interactive primitive, not a restyle.
 
-It was also tested by actually building that second screen, not just
-inspecting it: the "listing" screen (reached from the home page's category
-tab and "Buy car" rail) is real, param-driven, and composed **entirely**
-from the existing 13-primitive registry -- `src/server/mockServer.ts`
-returns a different `Screen` JSON per `category` param (`all`/`budget`/
-`premium`/`buy_used_car`), rendered through the identical `RenderNode` used
-for the home screen, with zero new component types. That's a second real
-screen at effectively 100% JSON-only coverage, which is the strongest
-evidence in this doc for the coverage claim above -- not just an estimate.
+It was also tested by actually building two more real screens, not just
+inspecting them:
+
+- **"listing"** (reached from the home page's category tab and "Buy car"
+  rail) -- a different `Screen` JSON per `category` param
+  (`all`/`budget`/`premium`/`buy_used_car`).
+- **"car_detail"** (reached from every car card across home, the listing
+  results, and the "Buy used car" tab's rail) -- a different `Screen` JSON
+  per `listingId` param, matched against the real app's actual car-detail
+  layout (`docs/reference-screenshots/car-detail-1.png`): hero image, spec
+  chip row, stock badge, title/variant, location, feature badges, an EMI
+  box, a price box, and a two-button CTA row.
+
+Both are served by `src/server/mockServer.ts` and rendered through the
+identical `RenderNode` used for the home screen, with **zero new component
+types** across either screen. That's two real screens at effectively 100%
+JSON-only coverage, which is the strongest evidence in this doc for the
+coverage claim above -- not just an estimate.
+
+Building `car_detail` also surfaced a real renderer bug -- see
+`AI_WORKFLOW.md`'s failure story -- which is itself a data point: the gap
+found by extending coverage wasn't a missing *pattern* in the schema, it
+was a bug in how the *existing* primitives combined a variant default with
+a custom style override. Fixed at the root (`styleUtils.ts`), not patched
+per-node.
 
 ## Round-1 surprise-screen result
 
