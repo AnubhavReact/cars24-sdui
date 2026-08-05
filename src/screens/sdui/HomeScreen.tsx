@@ -8,6 +8,7 @@ import { mark } from '../../perf/timing';
 import { createFrameJankTracker } from '../../perf/scrollJank';
 import { runAfterPaint } from '../../perf/runAfterPaint';
 import { fetchScreenJson } from '../../server/mockServer';
+import { cacheKeyFor, getCachedScreen, setCachedScreen } from '../../server/screenCache';
 
 const screen = homeJsonRaw as unknown as Screen;
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
@@ -28,26 +29,33 @@ const jank = createFrameJankTracker();
 // Real, JSON-driven destination for every navigate target. Calls the mock
 // server (src/server/mockServer.ts) for ANY screenId -- "listing" and
 // "car_detail" return hand-built, param-driven screens; everything else
-// falls back to a clean generic dummy screen (icon + title + params shown
-// as chips), never a raw "Screen: X, params: Y" debug dump. Shows a
-// loading state while the (simulated) fetch is in flight, then renders the
-// returned Screen through the exact same RenderNode/registry used for the
-// home screen.
+// falls back to a clean generic dummy screen. Renders through the exact
+// same RenderNode/registry used for the home screen.
+//
+// Stale-while-revalidate, matching the real Cars24 app (verified live: a
+// car-detail page shows a skeleton on first visit, but instantly shows
+// cached content with no loader on a revisit, refreshed silently in the
+// background). First visit to a given screenId+params: show the loading
+// state while fetching, then cache the result. Any later visit to the same
+// screenId+params: show the cached Screen immediately, no loading state at
+// all, while a fresh fetch happens invisibly behind it and updates the
+// cache for next time.
 function JsonDestination({ screenId, params }: { screenId: string; params?: Record<string, string> }) {
-  const [screen, setScreen] = useState<Screen | null>(null);
-  const paramsKey = JSON.stringify(params ?? {});
+  const cacheKey = cacheKeyFor(screenId, params);
+  const [screen, setScreen] = useState<Screen | null>(() => getCachedScreen(cacheKey) ?? null);
 
   useEffect(() => {
     let cancelled = false;
-    setScreen(null);
+    setScreen(getCachedScreen(cacheKey) ?? null);
     fetchScreenJson(screenId, params).then((s) => {
+      setCachedScreen(cacheKey, s);
       if (!cancelled) setScreen(s);
     });
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenId, paramsKey]);
+  }, [cacheKey]);
 
   if (!screen) {
     return (
