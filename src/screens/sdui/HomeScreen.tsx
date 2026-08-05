@@ -7,7 +7,7 @@ import type { Screen } from '../../schema/types';
 import { mark } from '../../perf/timing';
 import { createFrameJankTracker } from '../../perf/scrollJank';
 import { runAfterPaint } from '../../perf/runAfterPaint';
-import { fetchScreenJson, REAL_SCREEN_IDS } from '../../server/mockServer';
+import { fetchScreenJson } from '../../server/mockServer';
 
 const screen = homeJsonRaw as unknown as Screen;
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
@@ -25,15 +25,14 @@ const jsonParseBenchMs = Date.now() - jsonParseBenchStart;
 
 const jank = createFrameJankTracker();
 
-// Real, param-driven destination for any navigate target the mock server
-// (src/server/mockServer.ts) knows how to build JSON for -- currently
-// "listing" (keyed by category) and "car_detail" (keyed by listingId).
-// Calls fetchScreenJson, shows a loading state while that's in flight
-// (proving this is a genuine async fetch, not an instant local lookup),
-// then renders the returned Screen through the exact same
-// RenderNode/registry used for the home screen. Different params produce
-// visibly different results -- this is what makes navigation "real" rather
-// than a pipe that only proves data arrived.
+// Real, JSON-driven destination for every navigate target. Calls the mock
+// server (src/server/mockServer.ts) for ANY screenId -- "listing" and
+// "car_detail" return hand-built, param-driven screens; everything else
+// falls back to a clean generic dummy screen (icon + title + params shown
+// as chips), never a raw "Screen: X, params: Y" debug dump. Shows a
+// loading state while the (simulated) fetch is in flight, then renders the
+// returned Screen through the exact same RenderNode/registry used for the
+// home screen.
 function JsonDestination({ screenId, params }: { screenId: string; params?: Record<string, string> }) {
   const [screen, setScreen] = useState<Screen | null>(null);
   const paramsKey = JSON.stringify(params ?? {});
@@ -119,21 +118,7 @@ function HomeScreenInner() {
               <Text style={{ color: '#4B3AF0', fontWeight: '700', fontSize: 16 }}>{'< Back'}</Text>
             </Pressable>
           </View>
-          {REAL_SCREEN_IDS.has(top.screenId) ? (
-            <JsonDestination screenId={top.screenId} params={top.params} />
-          ) : (
-            <View style={{ padding: 16 }}>
-              <Text style={{ fontSize: 20, fontWeight: '700' }}>Screen: {top.screenId}</Text>
-              {top.params && (
-                <Text style={{ marginTop: 8, color: '#6B7280' }}>{JSON.stringify(top.params)}</Text>
-              )}
-              <Text style={{ marginTop: 16, color: '#6B7280' }}>
-                Placeholder destination -- this proves the navigate action carries a screen id +
-                params straight from JSON. Only "home", "listing", and "car_detail" have real JSON
-                built so far.
-              </Text>
-            </View>
-          )}
+          <JsonDestination screenId={top.screenId} params={top.params} />
         </View>
       )}
 

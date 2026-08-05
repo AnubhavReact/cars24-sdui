@@ -233,6 +233,89 @@ function buildCarDetailScreen(listingId: string): Screen {
   };
 }
 
+const GENERIC_SCREEN_ICONS: Record<string, string> = {
+  add_vehicle: 'car-outline',
+  cash_against_car: 'cash-outline',
+  challan_payment: 'receipt-outline',
+  crashfree_india: 'shield-outline',
+  fastag_recharge: 'card-outline',
+  insurance: 'shield-checkmark-outline',
+  new_car_detail: 'car-sport-outline',
+  new_cars: 'car-sport-outline',
+  profile: 'person-circle-outline',
+  return_policy: 'refresh-circle-outline',
+  roadside_assistance: 'alert-circle-outline',
+  search: 'search-outline',
+  showroom_detail: 'business-outline',
+  test_drive: 'speedometer-outline',
+  warranty: 'shield-checkmark-outline',
+};
+
+function humanizeScreenId(screenId: string): string {
+  return screenId
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+// Generic dummy screen for every navigate target that doesn't have a
+// hand-built screen (buildListingScreen / buildCarDetailScreen) yet. Every
+// `navigate` action in this app resolves to *some* real Screen JSON, never
+// a raw debug dump -- this is what makes that true for the destinations
+// that were genuinely out of scope to fully build under the timebox,
+// without falling back to unstyled "Screen: X, params: Y" text.
+function buildGenericScreen(screenId: string, params?: Record<string, string>): Screen {
+  const title = humanizeScreenId(screenId);
+  const icon = GENERIC_SCREEN_ICONS[screenId] ?? 'apps-outline';
+  const paramEntries = Object.entries(params ?? {});
+
+  return {
+    screenId,
+    schemaVersion: 1,
+    title,
+    sections: [
+      {
+        id: 'generic_icon',
+        type: 'icon',
+        props: { name: icon, size: 56 },
+        style: { color: '#4B3AF0', marginTop: 32 },
+      },
+      { id: 'generic_title', type: 'text', props: { content: title }, style: { fontSize: 22, fontWeight: '700', marginTop: 16 } },
+      {
+        id: 'generic_note',
+        type: 'text',
+        props: {
+          content:
+            'This screen renders from dummy JSON (no live API call) -- it was not built out in full detail under this build\'s timebox, but every navigate target resolves to real Screen JSON through the same renderer, not a hardcoded page.',
+        },
+        style: { color: '#6B7280', marginTop: 8 },
+      },
+      ...(paramEntries.length > 0
+        ? [
+            {
+              id: 'generic_params_label',
+              type: 'text',
+              props: { content: 'Params received from JSON:' },
+              style: { color: '#6B7280', fontSize: 12, marginTop: 16 },
+            } as Node,
+            {
+              id: 'generic_params_row',
+              type: 'row',
+              style: { gap: 6, marginTop: 6 },
+              children: paramEntries.map(
+                ([key, value]): Node => ({
+                  id: `generic_param_${key}`,
+                  type: 'badge',
+                  props: { text: `${key}: ${value}`, tone: 'brand' },
+                })
+              ),
+            } as Node,
+          ]
+        : []),
+    ],
+  };
+}
+
 export async function fetchScreenJson(screenId: string, params?: Record<string, string>): Promise<Screen> {
   // Artificial network-like delay so this is a genuine, isolable "fetch"
   // phase -- unlike the home screen's JSON, which is bundled locally via
@@ -244,10 +327,5 @@ export async function fetchScreenJson(screenId: string, params?: Record<string, 
   if (screenId === 'car_detail') {
     return buildCarDetailScreen(params?.listingId ?? '');
   }
-  throw new Error(`No mock screen registered for screenId "${screenId}"`);
+  return buildGenericScreen(screenId, params);
 }
-
-// Screen ids this mock server can actually build JSON for. HomeScreen.tsx
-// uses this to decide between the real fetch-and-render path and the
-// generic "Screen: X" placeholder for destinations that were out of scope.
-export const REAL_SCREEN_IDS = new Set(['listing', 'car_detail']);

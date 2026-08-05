@@ -23,6 +23,36 @@ import { runAfterPaint } from '../../perf/runAfterPaint';
 
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
 
+// Purely local/hardcoded -- no JSON, no server call, matching this screen's
+// whole point as the zero-JSON perf baseline. A plain string-formatting
+// helper, not a schema/renderer dependency, so it doesn't compromise that.
+const NAV_SCREEN_ICONS: Record<string, string> = {
+  add_vehicle: 'car-outline',
+  cash_against_car: 'cash-outline',
+  challan_payment: 'receipt-outline',
+  crashfree_india: 'shield-outline',
+  fastag_recharge: 'card-outline',
+  insurance: 'shield-checkmark-outline',
+  new_car_detail: 'car-sport-outline',
+  new_cars: 'car-sport-outline',
+  profile: 'person-circle-outline',
+  return_policy: 'refresh-circle-outline',
+  roadside_assistance: 'alert-circle-outline',
+  search: 'search-outline',
+  showroom_detail: 'business-outline',
+  test_drive: 'speedometer-outline',
+  warranty: 'shield-checkmark-outline',
+  listing: 'list-outline',
+  car_detail: 'car-outline',
+};
+
+function humanizeScreenId(screenId: string): string {
+  return screenId
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 mark('static_module_eval_done');
 const jank = createFrameJankTracker();
 
@@ -275,11 +305,32 @@ export function StaticHomeScreen() {
       {navScreen && (
         <View style={[StyleSheet.absoluteFill, { backgroundColor: '#fff', paddingTop: topPad }]}>
           <View style={{ padding: 16 }}>
-            <Pressable onPress={() => setNavScreen(null)} style={{ marginBottom: 16 }}>
+            <Pressable onPress={() => setNavScreen(null)} style={{ marginBottom: 8 }}>
               <Text style={{ color: '#4B3AF0', fontWeight: '700', fontSize: 16 }}>{'< Back'}</Text>
             </Pressable>
-            <Text style={{ fontSize: 20, fontWeight: '700' }}>Screen: {navScreen.id}</Text>
-            {navScreen.params && <Text style={{ marginTop: 8, color: '#6B7280' }}>{JSON.stringify(navScreen.params)}</Text>}
+            <View style={{ alignItems: 'center', marginTop: 24 }}>
+              <Ionicons
+                name={(NAV_SCREEN_ICONS[navScreen.id] ?? 'apps-outline') as keyof typeof Ionicons.glyphMap}
+                size={56}
+                color="#4B3AF0"
+              />
+              <Text style={{ fontSize: 22, fontWeight: '700', marginTop: 16 }}>
+                {humanizeScreenId(navScreen.id)}
+              </Text>
+              <Text style={{ color: '#6B7280', marginTop: 8, textAlign: 'center' }}>
+                Dummy content, hardcoded directly in this screen -- no JSON, no server call. That's
+                the point of the static twin: this is the zero-SDUI-overhead baseline.
+              </Text>
+              {navScreen.params && (
+                <View style={{ flexDirection: 'row', gap: 6, marginTop: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {Object.entries(navScreen.params).map(([key, value]) => (
+                    <View key={key} style={{ backgroundColor: '#EDE9FE', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
+                      <Text style={{ fontSize: 12, color: '#374151' }}>{key}: {value}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
       )}
