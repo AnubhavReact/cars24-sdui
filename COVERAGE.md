@@ -57,6 +57,16 @@ if that prop is added) -- with the clearest gap being the image-carousel
 with tab strip (Exterior/Interior/Features/Highlights/Tyres) on the car
 detail page, which is a new interactive primitive, not a restyle.
 
+It was also tested by actually building that second screen, not just
+inspecting it: the "listing" screen (reached from the home page's category
+tab and "Buy car" rail) is real, param-driven, and composed **entirely**
+from the existing 13-primitive registry -- `src/server/mockServer.ts`
+returns a different `Screen` JSON per `category` param (`all`/`budget`/
+`premium`/`buy_used_car`), rendered through the identical `RenderNode` used
+for the home screen, with zero new component types. That's a second real
+screen at effectively 100% JSON-only coverage, which is the strongest
+evidence in this doc for the coverage claim above -- not just an estimate.
+
 ## Round-1 surprise-screen result
 
 To be filled in during the live round-1 test: screen given, % rendered with
