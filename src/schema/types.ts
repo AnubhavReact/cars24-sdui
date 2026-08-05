@@ -100,6 +100,8 @@ export interface StyleProps {
   margin?: number;
   marginHorizontal?: number;
   marginVertical?: number;
+  marginTop?: number;
+  marginBottom?: number;
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;

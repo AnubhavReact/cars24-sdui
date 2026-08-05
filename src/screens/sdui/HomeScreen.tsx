@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StatusBar, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Modal, Platform, Pressable, ScrollView, StatusBar, Text, View } from 'react-native';
 import { SduiProvider, useSdui } from '../../actions/context';
 import { RenderNode } from '../../renderer/Renderer';
 import homeJsonRaw from '../../data/home.json';
@@ -7,6 +7,7 @@ import type { Screen } from '../../schema/types';
 import { mark } from '../../perf/timing';
 import { createFrameJankTracker } from '../../perf/scrollJank';
 import { runAfterPaint } from '../../perf/runAfterPaint';
+import { fetchScreenJson } from '../../server/mockServer';
 
 const screen = homeJsonRaw as unknown as Screen;
 const topPad = Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 44;
@@ -23,6 +24,50 @@ JSON.parse(JSON.stringify(homeJsonRaw));
 const jsonParseBenchMs = Date.now() - jsonParseBenchStart;
 
 const jank = createFrameJankTracker();
+
+// Real, param-driven destination for the "listing" navigate target: calls
+// the mock server (src/server/mockServer.ts) with the params carried by the
+// navigate action, shows a loading state while that's in flight (proving
+// this is a genuine async fetch, not an instant local lookup), then renders
+// the returned Screen through the exact same RenderNode/registry used for
+// the home screen. Different `category` params produce visibly different
+// results -- this is the thing that makes navigation "real" rather than a
+// pipe that only proves data arrived.
+function ListingDestination({ params }: { params?: Record<string, string> }) {
+  const [screen, setScreen] = useState<Screen | null>(null);
+  const paramsKey = JSON.stringify(params ?? {});
+
+  useEffect(() => {
+    let cancelled = false;
+    setScreen(null);
+    fetchScreenJson('listing', params).then((s) => {
+      if (!cancelled) setScreen(s);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramsKey]);
+
+  if (!screen) {
+    return (
+      <View style={{ padding: 16, alignItems: 'center', marginTop: 48 }}>
+        <ActivityIndicator color="#4B3AF0" />
+        <Text style={{ marginTop: 12, color: '#6B7280' }}>
+          Fetching listing for "{params?.category ?? 'all'}"…
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16 }}>
+      {screen.sections.map((node) => (
+        <RenderNode key={node.id} node={node} />
+      ))}
+    </ScrollView>
+  );
+}
 
 function HomeScreenInner() {
   const { stack, pop, activeSheet, closeSheet } = useSdui();
@@ -70,19 +115,26 @@ function HomeScreenInner() {
             paddingTop: topPad,
           }}
         >
-          <View style={{ padding: 16 }}>
-            <Pressable onPress={pop} style={{ marginBottom: 16 }}>
+          <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+            <Pressable onPress={pop} style={{ marginBottom: 8 }}>
               <Text style={{ color: '#4B3AF0', fontWeight: '700', fontSize: 16 }}>{'< Back'}</Text>
             </Pressable>
-            <Text style={{ fontSize: 20, fontWeight: '700' }}>Screen: {top.screenId}</Text>
-            {top.params && (
-              <Text style={{ marginTop: 8, color: '#6B7280' }}>{JSON.stringify(top.params)}</Text>
-            )}
-            <Text style={{ marginTop: 16, color: '#6B7280' }}>
-              Placeholder destination -- this proves the navigate action carries a screen id +
-              params straight from JSON. Only the home screen's JSON has been built so far.
-            </Text>
           </View>
+          {top.screenId === 'listing' ? (
+            <ListingDestination params={top.params} />
+          ) : (
+            <View style={{ padding: 16 }}>
+              <Text style={{ fontSize: 20, fontWeight: '700' }}>Screen: {top.screenId}</Text>
+              {top.params && (
+                <Text style={{ marginTop: 8, color: '#6B7280' }}>{JSON.stringify(top.params)}</Text>
+              )}
+              <Text style={{ marginTop: 16, color: '#6B7280' }}>
+                Placeholder destination -- this proves the navigate action carries a screen id +
+                params straight from JSON. Only "home" and "listing" have real JSON built so far
+                (see the "listing" destination for a fully param-driven example).
+              </Text>
+            </View>
+          )}
         </View>
       )}
 

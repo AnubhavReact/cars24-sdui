@@ -11,6 +11,8 @@ export function toViewStyle(style?: StyleProps): ViewStyle {
     margin: style.margin,
     marginHorizontal: style.marginHorizontal,
     marginVertical: style.marginVertical,
+    marginTop: style.marginTop,
+    marginBottom: style.marginBottom,
     borderRadius: style.borderRadius,
     borderWidth: style.borderWidth,
     borderColor: style.borderColor,
