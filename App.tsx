@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { HomeScreen } from './src/screens/sdui/HomeScreen';
 import { StaticHomeScreen } from './src/screens/static/StaticHomeScreen';
+import { DevModeProvider, useDevMode } from './src/devmode/context';
 
 // For actual cold-start perf measurement (PERF.md), this is flipped and the
 // app is rebuilt as a release APK per variant, so each variant is genuinely
@@ -12,12 +13,37 @@ import { StaticHomeScreen } from './src/screens/static/StaticHomeScreen';
 // for the screen switched *into*.
 const INITIAL_SCREEN: 'sdui' | 'static' = 'sdui';
 
-export default function App() {
+function DevOverlayToggle() {
+  const { showDebugOverlays, toggle } = useDevMode();
+  if (!__DEV__) return null;
+  return (
+    <Pressable
+      onPress={toggle}
+      style={{
+        position: 'absolute',
+        bottom: 76,
+        right: 16,
+        backgroundColor: showDebugOverlays ? '#B45309' : '#111827',
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 24,
+        opacity: 0.85,
+      }}
+    >
+      <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>
+        {showDebugOverlays ? 'Dev overlays: ON' : 'Dev overlays: OFF (real-user view)'}
+      </Text>
+    </Pressable>
+  );
+}
+
+function AppInner() {
   const [variant, setVariant] = useState<'sdui' | 'static'>(INITIAL_SCREEN);
 
   return (
     <View style={{ flex: 1 }}>
       {variant === 'sdui' ? <HomeScreen /> : <StaticHomeScreen />}
+      <DevOverlayToggle />
       <Pressable
         onPress={() => setVariant((v) => (v === 'sdui' ? 'static' : 'sdui'))}
         style={{
@@ -37,5 +63,13 @@ export default function App() {
       </Pressable>
       <StatusBar style="light" />
     </View>
+  );
+}
+
+export default function App() {
+  return (
+    <DevModeProvider>
+      <AppInner />
+    </DevModeProvider>
   );
 }
