@@ -5,7 +5,7 @@ import { useSdui } from '../actions/context';
 import type { Node } from '../schema/types';
 import { ButtonView } from './ButtonView';
 import { evalCondition } from './evalCondition';
-import { toTextStyle, toneColor, toViewStyle } from './styleUtils';
+import { TEXT_VARIANT_STYLES, toTextStyle, toneColor, toViewStyle } from './styleUtils';
 import { UnknownComponent } from './UnknownComponent';
 import { CLIENT_SCHEMA_VERSION } from '../schema/version';
 
@@ -120,7 +120,10 @@ function renderByType(node: Node): React.ReactElement {
 
     case 'text':
       return (
-        <Text style={textStyle} numberOfLines={props.numberOfLines as number | undefined}>
+        <Text
+          style={[TEXT_VARIANT_STYLES[props.variant as string] ?? {}, textStyle]}
+          numberOfLines={props.numberOfLines as number | undefined}
+        >
           {String(props.content ?? '')}
         </Text>
       );

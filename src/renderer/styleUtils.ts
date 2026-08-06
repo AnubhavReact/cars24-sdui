@@ -50,6 +50,23 @@ export function toTextStyle(style?: StyleProps): TextStyle {
   });
 }
 
+// Base typography preset per `text` node's `variant` prop. This was
+// previously a no-op: the renderer only ever applied a node's explicit
+// `style`, never looked at `props.variant` at all, so any text node
+// relying on `variant: 'title'` alone (no explicit fontSize/fontWeight)
+// silently rendered as unstyled plain text -- affected ~19 nodes across
+// home.json (most section titles), caught by comparing SDUI vs. Static
+// screenshots side by side. `style` still overrides these on a per-node
+// basis, same override order as every other variant-based default
+// (button, badge) already in the renderer.
+export const TEXT_VARIANT_STYLES: Record<string, TextStyle> = {
+  title: { fontSize: 18, fontWeight: '700' },
+  subtitle: { fontSize: 16, fontWeight: '600' },
+  body: { fontSize: 14, fontWeight: '400' },
+  caption: { fontSize: 12, fontWeight: '400', color: '#6B7280' },
+  label: { fontSize: 13, fontWeight: '600' },
+};
+
 export function toneColor(tone?: string): string {
   switch (tone) {
     case 'success':
