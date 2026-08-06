@@ -1,34 +1,22 @@
-# Demo recordings
+# Demo recording
 
-Two clips, captured via `adb shell screenrecord` directly from the Pixel_7
-emulator (not a phone screen-recording app), covering the required beats:
+`demo.mp4` — screen recording covering the required beats. (Re-encoded
+with ffmpeg from the original ~186MB QuickTime `.mov` capture down to
+~2.4MB, same content, to fit under GitHub's 100MB file limit -- mostly
+static UI compresses extremely well.)
 
-## `1-main-demo.mp4` (~3 min)
-
-- Home screen rendering entirely from `home.json` (JSON render)
-- Unknown-component fallback: two dashed orange boxes visible near the top
-  ("unknown type" and "requires schema v2") -- the page continues rendering
-  normally around them, no crash
-- Tapping the location picker opens a bottom sheet (`openSheet` action)
-- Navigating to a car's detail page (real, param-driven screen fetched via
-  the mock server, not a placeholder)
-- The tenure selector (24/36/48 months) updating the displayed EMI live --
-  the brief's literal example action
-
-## `2-live-json-edit.mp4` (~1 min)
-
-Recorded separately (screenrecord's process naturally ended after the
-first clip's time limit before this beat) rather than splicing one video --
-no video-editing tooling was available in this environment, so two honest
-clips instead of a stitched fake continuous one.
-
-- Shows the footer in its original state
-- `home.json`'s footer section is edited directly (color + text) --
-  confirmed via `git diff --stat` immediately before this recording that
-  only `home.json` changed, no `.ts`/`.tsx` files
-- App is force-stopped and relaunched (**no rebuild**)
-- Footer now shows the edited content -- proving the JSON-only live-edit
-  capability the assignment requires
-
-The edit was reverted immediately after recording; `home.json` in the repo
-is back to its original content.
+- **Page rendering from JSON** — cold open, full scroll through the home
+  screen, all sections rendering from `src/data/home.json`
+- **Unknown-component fallback** — the two dashed orange boxes near the
+  top of the page (unregistered type, and a node requiring a newer schema
+  version than this client supports); the page renders normally around
+  them instead of crashing
+- **Bottom sheet** — tapping the location picker opens a real,
+  JSON-driven sheet (search box, banner, CTA, popular-cities grid)
+- **Tenure selector + EMI** — on the car detail page, selecting a
+  different loan tenure (24/36/48 months) updates the displayed EMI live
+- **Live JSON edit, no rebuild** — `home.json`'s `trending_rail` section
+  had its `type` changed from `"carousel"` to `"grid"` (one word), the app
+  was force-stopped and relaunched with no build step, and the section
+  visibly changed from a horizontal scrolling rail to a vertical grid --
+  proving the JSON controls page *structure*, not just styling
