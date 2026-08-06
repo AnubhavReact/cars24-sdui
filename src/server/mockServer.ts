@@ -61,6 +61,28 @@ const CAR_INDEX: Record<string, CarListing> = Object.fromEntries(
     .map((car) => [car.id, car])
 );
 
+// Standard reducing-balance EMI formula, so the tenure selector (see
+// buildCarDetailScreen) shows a genuinely different, plausible EMI per
+// tenure instead of a hardcoded string per option -- computed from the
+// car's actual price, not faked.
+const EMI_TENURE_OPTIONS = [24, 36, 48] as const;
+const EMI_ANNUAL_RATE_PERCENT = 11;
+
+function parsePriceToRupees(priceStr: string): number {
+  const match = priceStr.match(/([\d.]+)\s*lakh/i);
+  return match ? Math.round(parseFloat(match[1]) * 100000) : 0;
+}
+
+function computeMonthlyEmi(principal: number, months: number): number {
+  const r = EMI_ANNUAL_RATE_PERCENT / 12 / 100;
+  const factor = Math.pow(1 + r, months);
+  return Math.round((principal * r * factor) / (factor - 1));
+}
+
+function formatRupees(amount: number): string {
+  return `₹${amount.toLocaleString('en-IN')}`;
+}
+
 function buildCarCardNode(car: CarListing): Node {
   return {
     id: `listing_card_${car.id}`,
@@ -193,12 +215,64 @@ function buildCarDetailScreen(listingId: string): Screen {
         ],
       },
       {
+        id: 'car_detail_tenure_label',
+        type: 'text',
+        props: { content: 'Choose your EMI tenure' },
+        style: { fontSize: 15, fontWeight: '700', marginTop: 20 },
+      },
+      {
+        id: 'car_detail_tenure_row',
+        type: 'row',
+        style: { gap: 8, marginTop: 8 },
+        children: EMI_TENURE_OPTIONS.flatMap((months): Node[] => {
+          const tenureKey = `tenure_${car.id}`;
+          const isDefault = months === 36;
+          const selectedCondition = isDefault
+            ? { and: [{ state: tenureKey, notEquals: 24 }, { state: tenureKey, notEquals: 48 }] }
+            : { state: tenureKey, equals: months };
+          const unselectedCondition = isDefault
+            ? { or: [{ state: tenureKey, equals: 24 }, { state: tenureKey, equals: 48 }] }
+            : { state: tenureKey, notEquals: months };
+          return [
+            {
+              id: `car_detail_tenure_${months}_sel`,
+              type: 'tappable',
+              onTap: { type: 'setState', key: tenureKey, value: months },
+              visibleIf: selectedCondition,
+              children: [{ id: `car_detail_tenure_${months}_sel_btn`, type: 'button', props: { label: `${months} months`, variant: 'primary' }, style: { paddingHorizontal: 16 } }],
+            },
+            {
+              id: `car_detail_tenure_${months}_unsel`,
+              type: 'tappable',
+              onTap: { type: 'setState', key: tenureKey, value: months },
+              visibleIf: unselectedCondition,
+              children: [{ id: `car_detail_tenure_${months}_unsel_btn`, type: 'button', props: { label: `${months} months`, variant: 'secondary' }, style: { paddingHorizontal: 16 } }],
+            },
+          ];
+        }),
+      },
+      {
         id: 'car_detail_emi_box',
         type: 'stack',
-        style: { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 16, marginTop: 16, gap: 4 },
+        style: { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 16, marginTop: 12, gap: 4 },
         children: [
           { id: 'car_detail_emi_label', type: 'text', props: { content: 'EMI on Zero Downpayment' }, style: { color: '#6B7280', fontSize: 13 } },
-          { id: 'car_detail_emi_value', type: 'text', props: { content: `EMI ${car.emi}` }, style: { fontSize: 18, fontWeight: '700' } },
+          ...EMI_TENURE_OPTIONS.map((months): Node => {
+            const tenureKey = `tenure_${car.id}`;
+            const isDefault = months === 36;
+            const visibleIf = isDefault
+              ? { and: [{ state: tenureKey, notEquals: 24 }, { state: tenureKey, notEquals: 48 }] }
+              : { state: tenureKey, equals: months };
+            const principal = parsePriceToRupees(car.price);
+            const emi = computeMonthlyEmi(principal, months);
+            return {
+              id: `car_detail_emi_value_${months}`,
+              type: 'text',
+              props: { content: `EMI ${formatRupees(emi)}/m* for ${months} months` },
+              style: { fontSize: 18, fontWeight: '700' },
+              visibleIf,
+            };
+          }),
         ],
       },
       {
