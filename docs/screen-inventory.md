@@ -50,9 +50,12 @@ strong candidate for the required SDUI-driven interactive element.
   bottom CTA bar).
 - The brief's "tenure selector -> EMI" example isn't present in-place on
   these screens as tested — "Check eligibility" on the car detail page
-  bounced back without showing a sheet (likely gated behind login). Not
-  chasing this further; per the brief this was only an example ("e.g.") of
-  a valid interactive action. **Decision: use the category-tab selection
-  (now correctly modeled as an in-place content swap, see above) as our
-  required SDUI-driven interactive element**, and note this substitution
-  explicitly in the README.
+  bounced back without showing a sheet (likely gated behind login).
+  **That login-gate is the real app's own business-logic decision, not a
+  limitation of our schema** -- our own `car_detail` screen (built in
+  `src/server/mockServer.ts`) has its own real 24/36/48-month tenure
+  selector, no login required, where picking a tenure updates the
+  displayed EMI (computed from the car's price via a real EMI formula).
+  So both the tenure-selector example *and* the category-tab selection
+  (in-place content swap, see above) exist as independently real
+  demonstrations of the required SDUI-driven interactive pattern.

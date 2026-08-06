@@ -26,7 +26,7 @@ home page (see `docs/screen-inventory.md`) is composed from this same set.
 - [x] Lists / grids -- `grid` ("Manage your vehicle"), `list` ("Why choose Cars24")
 - [x] Carousels/rails -- `carousel`, used 6 times (category tabs, buy-car rail, car listings, showrooms, trending, value-prop banners)
 - [x] Conditionals -- `visibleIf` (`equals`/`notEquals`/`and`/`or`), demonstrated by the "All" tab's selected-chip styling
-- [x] Actions -- 6 of 7 action types demonstrated live on the home screen: `navigate` (tabs, cards, CTAs), `openSheet` (location picker), `openUrl` (promo banner), `call` (showroom "Call us now"), `setState` (tab selection), `toggleState` (car-card favorite heart, paired with `visibleIf` to swap the outline/filled icon). `composite` (run several actions from one tap) is implemented in the dispatcher but has no home-screen use case that needs it yet -- kept simple rather than forced.
+- [x] Actions -- 6 of 7 action types demonstrated live across the home and car-detail screens: `navigate` (tabs, cards, CTAs), `openSheet` (location picker, "Book now"), `openUrl` (promo banner), `call` (showroom "Call us now"), `setState` (home tab selection; **and the brief's own literal example** -- car-detail's 24/36/48-month tenure selector updating the displayed EMI, computed from the car's price via a real EMI formula, no login required unlike the real app), `toggleState` (car-card favorite heart, paired with `visibleIf` to swap the outline/filled icon). `composite` (run several actions from one tap) is implemented in the dispatcher but has no use case that needs it yet -- kept simple rather than forced.
 - [x] Styling overrides -- every node's `style` (color, spacing, radius, sizing, typography, flex alignment) is applied generically by the renderer, not per-type
 - [x] Unknown-component fallback -- `video_carousel` node (unregistered type) and `ar_preview_banner` node (`minVersion: 2`, newer than this client) both degrade to the same silent-in-prod / labeled-in-dev fallback, proving both degrade paths independently
 - [x] Versioning -- `minVersion` on a node + `CLIENT_SCHEMA_VERSION` in the client; see `README.md` for the full story
@@ -41,8 +41,13 @@ same 13 primitives in a new arrangement.
 
 The patterns that would need new client code:
 - **New interaction primitives** the registry has no equivalent for -- e.g. a
-  drag-to-reorder list, a map view, a video player, a slider/stepper input
-  (the tenure-selector-style control from the brief would need this)
+  drag-to-reorder list, a map view, a video player, a continuous drag
+  slider. (A *discrete-option* tenure selector -- pick 24/36/48 months from
+  a fixed set -- needed none of this: it's built entirely from
+  `tappable`+`button`+`setState`+`visibleIf`, the same primitives as
+  everything else. See `car_detail`'s real tenure-selector-updates-EMI
+  feature. Only a true continuous slider/stepper would need a new
+  primitive -- corrected from an earlier, overbroad claim here.)
 - **New visual primitives** with genuinely different rendering, not just
   different styling -- e.g. a circular progress ring, a chart
 - **Complex multi-field forms** with client-side validation logic that goes

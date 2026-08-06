@@ -178,14 +178,18 @@ section in your README is enough" allowance.
   {...}" text dump. Building out full, unique layouts for all fifteen-plus
   destinations was out of scope under the timebox; making every one of
   them resolve to *something* real through the JSON pipeline was not.
-- **The brief's tenure-selector → EMI example isn't on this page as-is.**
-  Confirmed live on the real app (see `docs/screen-inventory.md`) -- "Check
-  eligibility" on the car-detail page needs login before showing anything.
-  Substituted the tab/chip selection as the required SDUI-driven
-  interactive element instead, since it's a real, observed pattern rather
-  than a fabricated one -- and (after a correction, see `AI_WORKFLOW.md`)
-  it's modeled as the in-place content swap it actually is in the real
-  app, using `setState` + `visibleIf`.
+- **The brief's tenure-selector → EMI example isn't reachable on the real
+  app without login** -- confirmed live (see `docs/screen-inventory.md`),
+  "Check eligibility" on the real car-detail page bounces back
+  unauthenticated. That's the *real app's* business-logic decision, not a
+  technical constraint on this schema, so it was built anyway: the
+  `car_detail` screen has a real 24/36/48-month tenure selector where
+  picking a tenure updates the displayed EMI, computed from the car's
+  actual price via a standard EMI formula (not a hardcoded string per
+  option) -- pure `setState` + `visibleIf`, no login, no new component
+  types. The tab/chip selection (`setState` + `visibleIf`, corrected per
+  `AI_WORKFLOW.md`) remains in place too, as a second, independently
+  real example of the same required pattern.
 - **Perf measurement is n=3/n=4 samples on an emulator**, not a physical
   device across dozens of runs. Stated as a limitation in `PERF.md`, not
   hidden.
