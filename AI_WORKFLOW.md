@@ -125,6 +125,86 @@ favorite-heart toggle), gated every "All tab" section behind
 matching the verified real layout (2x2 category grid + a car rail).
 Full trail in `docs/screen-inventory.md`.
 
+## Bonus: a full live planning cycle (task → read → explore → questions → answers → review)
+
+Everything above happened inside normal build turns. This one is different
+on purpose: run as a standalone exercise, close to what round-1's "screen
+you didn't build, plan it live" test will actually look like -- a task
+handed over, clarifying questions asked and answered in real time, a
+design converged on, **with implementation explicitly out of scope for
+this exercise** (per direct instruction, see below) so the artifact here
+is the planning conversation itself, not new code.
+
+**1. Task given (verbatim):** *"okay so i have picked explore page in
+cars24 ui so basically we have to deisgn it sdui , so currently we have a
+child depend upon the figma now we need to update this page to we need to
+change child code everytime so to reudce this we will create components
+like this api payload send json and our child will render acc to that ?"*
+
+**2. Read back to confirm understanding, before doing anything else:** I
+restated the motivation in my own words (child code coupled to
+Figma/design changes today; JSON payload + generic renderer decouples
+that) and confirmed it matched, rather than assuming and moving straight
+to implementation.
+
+**3. Explored the real screen first** rather than guessing its content:
+launched the real Cars24 app, navigated to the actual "Explore" tab,
+screenshotted and scrolled through all 11 sections of its "Buy used car"
+sub-tab, and live-tested tab-switch behavior by tapping between the four
+top tabs.
+
+**4. Two real questions surfaced while drafting JSON from scratch** for
+this screen (not reusing `home.json` -- an explicit instruction: *"so dont
+relate it to our existed home.json it fresh think you need to create a
+json from scratch then ask me question based on this"*):
+   - **Q1:** the ranked trending-car cards ("Verna ₹2L-11L") are a price
+     range across a model's variants, not one specific listing -- what
+     should tapping one navigate to?
+   - **Q2:** the "01"/"02" rank number rendered behind/overlapping the car
+     image has no equivalent in the current schema (no z-index/layering
+     concept exists) -- extend the schema for real layering, fake the
+     visual, or drop the effect entirely?
+
+**5. Answers (verbatim):** *"so for question 1 basically it go to call
+listing api , we will pass data through params and based on this get api
+will call for listing and now for que2 the image and its list will come
+from api we need to just render that list also if we need to show no we
+willl add a layering and based on index we will show it"* -- resolved Q1
+to `navigate` → `listing` with a new `model` param (reusing the existing
+screen); resolved Q2 to adding real layering rather than faking it.
+
+**6. A follow-up clarifying question, because the answer to Q2 was still
+ambiguous** in one respect: does the server explicitly send each card's
+rank value, or does the client compute it from the card's position in the
+array? These have very different architectural implications (pure
+declarative data vs. new renderer logic), so I asked rather than picking
+one silently. **Answer:** *"yes most probably distinct and if not we will
+pick the index"* -- server-sent by default, with an index-based client
+fallback for resilience.
+
+**7. Verification, not just conversation:** live-tested the two tabs I
+hadn't checked yet ("Get loans", "Car check") on the real app rather than
+assuming they matched the pattern already confirmed for the other two --
+and found a real inconsistency: "Get loans" actually navigates to the
+listing screen with an extra promotional banner prepended, while "Buy
+used car"/"Sell car"/"Car check" all do the in-place `setState` swap.
+This directly informed the tab-bar design below.
+
+**8. Design review and convergence:** proposed making the tab bar itself
+fully data-driven -- an array of tab definitions in JSON, each with its
+own independent `onTap` (already a property of the existing schema, not a
+new capability) -- so the real "3 tabs swap in place, 1 navigates"
+inconsistency needs zero special-case client code, it falls out of the
+existing per-node action design. Combined with one new primitive
+(`layered`, for the rank-overlay effect) this produced a complete,
+implementation-ready plan covering all 11 sections, with only one small,
+well-justified schema addition. **Implementation was deliberately not
+done** -- explicit instruction: *"so we need to make our tab component
+based on the listing comes in json"* was a design direction to fold into
+the plan, not a build instruction, and this whole exercise was framed
+up front as *"just doing a agent and developer communication for
+ai_workflow how i give you task and answers you questions."*
+
 ## One AI failure
 
 **Incident:** When wiring the SDUI renderer's tap handling, I (Claude) wrote
