@@ -398,6 +398,92 @@ function buildGenericScreen(screenId: string, params?: Record<string, string>): 
   };
 }
 
+// Real JSON content for the location-picker bottom sheet, matched against
+// the real Cars24 app's own location picker (headline + subtext + primary
+// CTA + popular-cities grid). Built entirely from existing primitives --
+// no new component type needed. Synchronous (no simulated fetch delay):
+// unlike full-screen navigation, sheets in real apps open instantly.
+const POPULAR_CITIES = [
+  { key: 'delhi', label: 'Delhi NCR', seed: 'city-delhi' },
+  { key: 'bangalore', label: 'Bangalore', seed: 'city-bangalore' },
+  { key: 'mumbai', label: 'Mumbai', seed: 'city-mumbai' },
+  { key: 'hyderabad', label: 'Hyderabad', seed: 'city-hyderabad' },
+  { key: 'gurgaon', label: 'Gurgaon', seed: 'city-gurgaon' },
+  { key: 'pune', label: 'Pune', seed: 'city-pune' },
+];
+
+export function buildLocationPickerSheet(): Node[] {
+  return [
+    {
+      id: 'location_sheet_search',
+      type: 'stack',
+      style: { backgroundColor: '#F3F4F6', borderRadius: 10, padding: 14, marginTop: 8 },
+      children: [{ id: 'location_sheet_search_text', type: 'text', props: { content: 'Search your city' }, style: { color: '#9CA3AF' } }],
+    },
+    {
+      id: 'location_sheet_banner',
+      type: 'image',
+      props: { uri: 'https://picsum.photos/seed/location-picker-banner/700/420' },
+      style: { aspectRatio: 1.6, borderRadius: 16, marginTop: 20 },
+    },
+    {
+      id: 'location_sheet_headline',
+      type: 'text',
+      props: { content: 'Find the perfect car right around the corner' },
+      style: { fontSize: 20, fontWeight: '700', textAlign: 'center', marginTop: 16 },
+    },
+    {
+      id: 'location_sheet_subtext',
+      type: 'text',
+      props: { content: "For best experience, allow location access. Your data is safe with us." },
+      style: { color: '#6B7280', textAlign: 'center', marginTop: 8, fontSize: 13 },
+    },
+    {
+      id: 'location_sheet_cta',
+      type: 'tappable',
+      onTap: { type: 'setState', key: 'selectedCity', value: 'current' },
+      children: [
+        {
+          id: 'location_sheet_cta_btn',
+          type: 'button',
+          props: { label: '⊙  Use your current location', variant: 'primary' },
+          style: { backgroundColor: '#EA580C', marginTop: 20 },
+        },
+      ],
+    },
+    {
+      id: 'location_sheet_popular_label',
+      type: 'text',
+      props: { content: 'POPULAR CITIES' },
+      style: { fontSize: 12, fontWeight: '700', color: '#6B7280', marginTop: 24 },
+    },
+    {
+      id: 'location_sheet_city_grid',
+      type: 'grid',
+      props: { columns: 3 },
+      style: { marginTop: 8 },
+      children: POPULAR_CITIES.map(
+        (city): Node => ({
+          id: `location_sheet_city_${city.key}`,
+          type: 'tappable',
+          onTap: { type: 'setState', key: 'selectedCity', value: city.key },
+          children: [
+            {
+              id: `location_sheet_city_${city.key}_body`,
+              type: 'stack',
+              style: { gap: 6, padding: 6 },
+              children: [
+                { id: `location_sheet_city_${city.key}_image`, type: 'image', props: { uri: `https://picsum.photos/seed/${city.seed}/300/220` }, style: { aspectRatio: 1.3, borderRadius: 10 } },
+                { id: `location_sheet_city_${city.key}_label`, type: 'text', props: { content: city.label }, style: { fontSize: 13, textAlign: 'center' } },
+              ],
+            },
+          ],
+        })
+      ),
+    },
+  ];
+}
+
 export async function fetchScreenJson(screenId: string, params?: Record<string, string>): Promise<Screen> {
   // Artificial network-like delay so this is a genuine, isolable "fetch"
   // phase -- unlike the home screen's JSON, which is bundled locally via

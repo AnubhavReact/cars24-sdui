@@ -7,7 +7,7 @@ import type { Screen } from '../../schema/types';
 import { mark } from '../../perf/timing';
 import { createFrameJankTracker } from '../../perf/scrollJank';
 import { runAfterPaint } from '../../perf/runAfterPaint';
-import { fetchScreenJson } from '../../server/mockServer';
+import { buildLocationPickerSheet, fetchScreenJson } from '../../server/mockServer';
 import { cacheKeyFor, getCachedScreen, setCachedScreen } from '../../server/screenCache';
 
 const screen = homeJsonRaw as unknown as Screen;
@@ -161,18 +161,33 @@ function HomeScreenInner() {
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
               padding: 20,
-              minHeight: 200,
+              maxHeight: '85%',
             }}
           >
-            <Text style={{ fontSize: 18, fontWeight: '700' }}>Sheet: {activeSheet?.sheetId}</Text>
-            {activeSheet?.params && (
-              <Text style={{ marginTop: 8, color: '#6B7280' }}>
-                {JSON.stringify(activeSheet.params)}
-              </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Pressable onPress={closeSheet} hitSlop={8}>
+                <Text style={{ fontSize: 22, color: '#111827' }}>{'‹'}</Text>
+              </Pressable>
+            </View>
+            {activeSheet?.sheetId === 'location_picker' ? (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                {buildLocationPickerSheet().map((node) => (
+                  <RenderNode key={node.id} node={node} />
+                ))}
+              </ScrollView>
+            ) : (
+              <>
+                <Text style={{ fontSize: 18, fontWeight: '700', marginTop: 8 }}>Sheet: {activeSheet?.sheetId}</Text>
+                {activeSheet?.params && (
+                  <Text style={{ marginTop: 8, color: '#6B7280' }}>
+                    {JSON.stringify(activeSheet.params)}
+                  </Text>
+                )}
+                <Pressable onPress={closeSheet} style={{ marginTop: 20, alignSelf: 'flex-start' }}>
+                  <Text style={{ color: '#4B3AF0', fontWeight: '700' }}>Close</Text>
+                </Pressable>
+              </>
             )}
-            <Pressable onPress={closeSheet} style={{ marginTop: 20, alignSelf: 'flex-start' }}>
-              <Text style={{ color: '#4B3AF0', fontWeight: '700' }}>Close</Text>
-            </Pressable>
           </View>
         </View>
       </Modal>
