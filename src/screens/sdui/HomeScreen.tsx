@@ -42,12 +42,26 @@ const jank = createFrameJankTracker();
 // cache for next time.
 function JsonDestination({ screenId, params }: { screenId: string; params?: Record<string, string> }) {
   const cacheKey = cacheKeyFor(screenId, params);
+  const wasCached = useRef(getCachedScreen(cacheKey) !== undefined).current;
   const [screen, setScreen] = useState<Screen | null>(() => getCachedScreen(cacheKey) ?? null);
+  const dataArrivedAt = useRef<number | null>(null);
+  const viewBuildLogged = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
     setScreen(getCachedScreen(cacheKey) ?? null);
+    // Real (not synthetic) fetch + view-build breakdown for the "SDUI
+    // breakdown" perf metric -- unlike home.json (bundled locally, no real
+    // fetch phase), navigate destinations genuinely go through
+    // fetchScreenJson's simulated network delay. Only logged on a true
+    // cache miss so the numbers reflect a real fetch, not a cache hit.
+    const fetchStart = Date.now();
     fetchScreenJson(screenId, params).then((s) => {
+      if (!wasCached) {
+        dataArrivedAt.current = Date.now();
+        // eslint-disable-next-line no-console
+        console.log(`[perf] nav_fetch_ms (${screenId}): ${dataArrivedAt.current - fetchStart}ms`);
+      }
       setCachedScreen(cacheKey, s);
       if (!cancelled) setScreen(s);
     });
@@ -67,7 +81,16 @@ function JsonDestination({ screenId, params }: { screenId: string; params?: Reco
   }
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16 }}>
+    <ScrollView
+      contentContainerStyle={{ padding: 16 }}
+      onLayout={() => {
+        if (!wasCached && dataArrivedAt.current !== null && !viewBuildLogged.current) {
+          viewBuildLogged.current = true;
+          // eslint-disable-next-line no-console
+          console.log(`[perf] nav_view_build_ms (${screenId}): ${Date.now() - dataArrivedAt.current}ms`);
+        }
+      }}
+    >
       {screen.sections.map((node) => (
         <RenderNode key={node.id} node={node} />
       ))}

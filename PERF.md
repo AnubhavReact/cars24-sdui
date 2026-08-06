@@ -26,9 +26,39 @@
 
 ### SDUI breakdown
 
+**Home screen** (`home.json`, bundled locally via `require`):
 - JSON fetch: **0ms** (bundled locally, not fetched -- see methodology)
 - JSON parse: folded into bundle eval, not separately isolable; synthetic re-parse benchmark of the same payload: **0-1ms**
 - View-build (mount → first layout): comparable to static, see table
+
+**Navigate destinations** (`listing`, `car_detail` -- genuinely fetched
+through `src/server/mockServer.ts`'s simulated network call, not bundled
+locally): this is the same page's *other* SDUI path, and it has a real,
+non-synthetic fetch phase the home screen doesn't -- a more literal answer
+to "JSON fetch/parse time vs view-build time" than the home screen's
+estimate above. Measured via `console.log` timestamps around
+`fetchScreenJson()` and the destination `ScrollView`'s `onLayout`, on a
+**debug build** (not the release build used for the cold-start table
+above -- this measures the JS-side fetch/render split specifically, which
+doesn't depend on release/debug optimization the way cold-start timing
+does), n=2-3, first fetch per screen+params only (cache hits are
+intentionally excluded -- see the stale-while-revalidate optimization
+below, a cache hit skips this phase entirely by design):
+
+| Screen | Fetch (network-simulated) | View-build (data arrived → laid out) |
+|---|---|---|
+| `listing` (n=2) | 459ms, 453ms → avg **456ms** | 45ms, 43ms → avg **44ms** |
+| `car_detail` (n=2 fetch, n=1 view-build) | 512ms, 485ms → avg **499ms** | 57ms |
+
+The fetch phase is dominated almost entirely by the mock server's
+deliberate 450ms artificial delay (see methodology) -- the ~5-50ms above
+450ms is real JS/promise/state-update overhead, not measurement noise from
+a badly-chosen proxy. **View-build is small and consistent** (~44-57ms)
+regardless of which screen or how much data came back, which is the
+actually interesting result: for this app's node-tree sizes, fetch
+latency dominates total navigation time by roughly 10x, so if this were a
+real backend, the SDUI renderer itself would not be the bottleneck --
+network would be.
 
 ### Full page time note
 
@@ -39,6 +69,34 @@ there wasn't a separate "full page" moment to isolate beyond TTR here.
 Remote images (`picsum.photos`) load asynchronously on top of both variants
 identically, using the same URLs, so image-decode latency is a wash between
 Static and SDUI and correctly excluded from the "SDUI overhead" number.
+
+### A methodology gap, disclosed rather than hidden
+
+The brief defines TTR/TTI as measured from **cold open** -- i.e. from the
+moment the user taps the app icon. What's reported above as "TTR proxy"
+and "TTI proxy" are measured **since JS eval start**, not since cold open
+-- they use `Date.now()` inside the JS runtime, which only starts ticking
+after the native process has already spent time launching (visible
+separately as the "Cold launch, native `TotalTime`" row, measured by
+Android's own clock via `adb shell am start -W`).
+
+These two numbers were **not added together** into one true "cold open →
+rendered" figure, and that's a real gap, not an oversight glossed over:
+`am start -W`'s `TotalTime` measures "time to first frame drawn," which
+for a React Native app may be an early native/blank frame, not
+necessarily the moment real content is visible -- and the two clocks
+(Android's `SystemClock` for `TotalTime`, JS's `Date.now()` for the
+marks) have no shared origin point in the current instrumentation, so
+naively summing them risks double-counting or missing a gap between
+"native frame drawn" and "JS eval starts." Resolving this properly needs
+a single shared timeline (e.g. a systrace capture, or a native-side
+timestamp bridged into JS at startup) -- exactly the kind of
+instrumentation named as a follow-up next to the unexplained native
+`TotalTime` gap below, and not chased for the same timebox reason.
+**Read TTR/TTI proxies above as "JS-side rendering cost," and native
+`TotalTime` as a separate, real "process-to-first-frame" cost** -- both
+honest, useful numbers on their own, but not yet combined into the
+single wall-clock figure the brief's definition technically asks for.
 
 ## Reading these numbers honestly
 
