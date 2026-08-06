@@ -36,50 +36,68 @@
 
 ## Three prompt → outcome stories
 
-### 1. Wrong first fix for the Metro/emulator bundle crash
+### 1. Stale-data caching bug, caught by comparing against the real app
 
-**What happened:** Right after the first `expo run:android` build, the app
-crashed with `TurboModuleRegistry.getEnforcing(...): 'PlatformConstants'
-could not be found` -- a classic "JS bundle doesn't match native binary"
-error. My first diagnosis was correct (a *different* project's Metro
-server was already running on port 8081, so this app's build was fetching
-someone else's JS bundle), but my **first fix was wrong**: I ran a second
-Metro instance on port 8082 and set `adb reverse tcp:8081 tcp:8082`,
-assuming the app would reach the dev server via `localhost:8081` on the
-device, which `adb reverse` would correctly redirect.
+**What happened:** Every navigate destination (`listing`, `car_detail`)
+went through a mock server with a simulated 450ms network delay. I wrote
+the destination screen to reset to a loading spinner on *every*
+navigation, including a repeat visit to a screen+params combination
+already fetched earlier in the same session -- so reopening the exact
+same car detail page a second time replayed the full 450ms wait and
+spinner again, every single time.
 
-**What was rejected and why:** That fix didn't work -- the crash persisted
-identically after reload. Rather than guess again, I read
-`PackagerConnectionSettings.kt` from the installed `react-native` package
-in `node_modules` to check what host RN Android actually uses on an
-emulator, which confirmed it defaults to `10.0.2.2:8081` (the emulator's
-alias for the host's real loopback), not `localhost:8081` -- so `adb
-reverse` was never in the request path at all, and the app kept hitting
-the *other* project's Metro on the host's actual port 8081 the whole
-time. The eventually-correct fix (chosen with the user, who preferred not
-to disturb their other running project) was pushing a SharedPreferences
-override (`debug_http_host`) into the app's own preferences file via `adb
-shell run-as`, redirecting only this app to `10.0.2.2:8082`.
+**What the user rejected and why (verbatim):** *"every time i navigate
+every time loader ? why if one time data is loaded then next time come
+then again loader , actual cars24 dont do this it showing stale data
+check cars24 also"* -- a direct instruction to go verify against the real
+app rather than take my behavior as correct by default.
 
-### 2. Perf methodology: the first cold-start sample was misleading
+**What I did:** opened the real Cars24 app fresh, tapped into a car's
+detail page (skeleton loader, as expected on a first visit), went back,
+tapped in again -- content appeared *instantly*, no loader at all,
+confirmed by screenshot. Built an in-memory stale-while-revalidate cache
+(`src/server/screenCache.ts`) keyed by `screenId + params`: first visit
+shows the loading state and caches the result; every later visit to the
+same key renders the cached `Screen` immediately with zero loading state,
+while a fresh fetch still happens invisibly behind it. Verified live by
+screenshotting a revisit at a 150ms delay after the tap -- well under the
+450ms fetch time -- confirming the fast path was a genuine cache hit, not
+luck.
 
-**What happened:** Prompted (by the task itself, not a literal user
-message) to measure release-build cold-start time via `adb shell am start
--W`, the first number recorded was `TotalTime: 6326` -- nearly 6.3 seconds,
-which would have made the write-up look alarming and, worse, non-comparable
-between the Static and SDUI variants if used inconsistently.
+### 2. A systemic styling bug, caught by comparing SDUI vs. Static screenshots side by side
 
-**What was rejected and why:** Rather than report that number, I ran a
-second cold start immediately after (same build, same device, just
-force-stop + relaunch) and got `TotalTime: 322` -- roughly 20x faster. The
-first number included one-time APK verification/ART compilation overhead
-from right after `adb install`, not representative of a real repeated
-cold-open. The methodology in `PERF.md` was rewritten to explicitly discard
-the first post-install launch and average only repeat cold starts, with
-this exact discrepancy called out in the write-up as the reason why, rather
-than silently picking whichever number looked better.
+**What happened:** The schema's `text` node has a `variant` prop
+(`title`/`subtitle`/`body`/`caption`/`label`), clearly intended to carry a
+typography preset. I never actually implemented it -- `Renderer.tsx`'s
+`text` case only ever applied a node's explicit `style`, and completely
+ignored `props.variant`. Any text node relying on `variant: "title"` alone,
+with no explicit `fontSize`/`fontWeight`, silently rendered as plain
+unstyled text. This shipped invisibly for most of the session because it
+doesn't look "broken" in isolation, just slightly thin -- it only became
+obvious in direct comparison.
 
-### 3. Schema design: rejected the "one component per section" default
+**What the user rejected and why:** the user placed SDUI and Static
+screenshots of the same section side by side and pointed at the exact
+mismatch: *"see you dont update the styling issue... see buy car, best
+deals for you text in sdui, compare to static ui"* -- Static's headings
+were correctly bold (hardcoded `fontSize: 18, fontWeight: '700'`), SDUI's
+were not.
+
+**What I did:** grepped `home.json` programmatically for every text node
+using `variant` without an explicit font override -- **19 nodes**, mostly
+section titles across the whole page. Root-caused it to the renderer
+never reading `props.variant` at all, and fixed it by adding a
+`TEXT_VARIANT_STYLES` preset map applied as the base style, with the
+node's explicit `style` still overriding on top (same precedence already
+used for button/badge variants). The same investigation also surfaced two
+related Static/SDUI parity gaps the user had separately flagged (a
+missing favorite-heart toggle, and the "Buy used car" tab still
+navigating in Static instead of swapping content in place, unlike the
+already-corrected SDUI version) -- fixed in the same pass, since a fair
+Static-vs-SDUI perf comparison requires matched content, not just matched
+architecture.
+
+### 3. Tab-navigation design, corrected by direct comparison against the real app
 
 **What happened:** Early in the build, I (Claude) explored the real Cars24
 app to decide how the category tabs should behave, and tapped "Buy used
@@ -154,9 +172,17 @@ reviewing AI-written UI code.
   temporary log was removed once confirmed working.
 - Perf numbers were pulled from real `adb shell am start -W` output and
   `adb logcat`-read JS timestamps on an actual release build, not
-  estimated or fabricated -- including reporting the awkward first-launch
-  outlier (see story #2 above) instead of quietly discarding it without
-  explanation.
+  estimated or fabricated -- including reporting an awkward first-launch
+  outlier (`TotalTime: 6326` right after `adb install`, vs. 98-322ms on
+  repeat launches of the identical build -- APK verification/ART
+  compilation overhead, not representative) in `PERF.md`'s methodology
+  section instead of quietly discarding it without explanation.
+- **Side-by-side screenshot comparison caught two real bugs this
+  session** that neither automated testing nor a single-screen eyeball
+  check would have: the missing text-variant typography (story #2 above)
+  and the Static/SDUI content-parity gaps (favorite heart, tab content) --
+  both only became obvious once the same content was placed next to its
+  supposedly-identical counterpart.
 - The unknown-component and versioning fallbacks were confirmed on-device
   in both directions: visible dev-mode placeholder in a debug build,
   confirmed silent (no crash, no visible artifact) in the actual release
