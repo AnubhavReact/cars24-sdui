@@ -1,4 +1,51 @@
-# Cars24 SDUI Assignment
+# Cars24 Home — Server-Driven UI in React Native
+
+> The entire Cars24 home page rendered from **one JSON payload** through a generic component registry: change the JSON and the screen changes, with no app release needed.
+
+![React Native](https://img.shields.io/badge/React_Native-0.86-61DAFB?logo=react&logoColor=white)
+![Expo](https://img.shields.io/badge/Expo-SDK_57-000020?logo=expo&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
+![Platform](https://img.shields.io/badge/platform-Android_·_iOS_·_Web-555)
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/reference-screenshots/sdui-render-final.png" width="200"><br><sub><b>Home</b>, 13 sections from JSON</sub></td>
+    <td align="center"><img src="docs/reference-screenshots/live-edit-after.png" width="200"><br><sub><b>Live edit</b>: new banner, zero code</sub></td>
+    <td align="center"><img src="docs/reference-screenshots/listing-premium.png" width="200"><br><sub><b>Param-driven listing</b> screen</sub></td>
+    <td align="center"><img src="docs/reference-screenshots/tenure-selector-48mo.png" width="200"><br><sub><b>EMI tenure selector</b> (computed)</sub></td>
+  </tr>
+</table>
+
+🎥 **Demo video:** [`docs/demo-recording/demo.mp4`](docs/demo-recording/demo.mp4)
+
+## Highlights
+
+| | |
+|---|---|
+| 🧩 **13 generic primitives** | `stack · row · carousel · grid · list · text · image · icon · badge · button · divider · spacer · tappable`. There is no `carCard` type: every section is composed from these. |
+| ⚡ **Action system** | `navigate · openUrl · openSheet · call · setState · toggleState · composite`, all through a single `dispatch()` |
+| 🔀 **Conditional UI** | `visibleIf` + client state powers tabs, chips and the EMI selector without new component types |
+| 🛡️ **Safe versioning** | `minVersion` per node, so unknown or too-new components fall back gracefully instead of crashing |
+| 🌐 **Mock server + cache** | async, param-keyed screen JSON (`budget` vs `premium` return different cars) with a screen cache |
+| 📊 **Measured, not guessed** | release-build Static-vs-SDUI benchmark: TTR **+8%**, TTI **+5%**, no scroll jank ([PERF.md](PERF.md)) |
+| 🤖 **AI-assisted build** | built agentically with Claude Code, including emulator driving via `adb`. Full log in [AI_WORKFLOW.md](AI_WORKFLOW.md) |
+
+## Tech stack
+
+| Area | Used |
+|---|---|
+| Framework | React Native 0.86 · Expo SDK 57 · React 19 |
+| Language | TypeScript 6 |
+| UI | Custom JSON renderer · `@expo/vector-icons` (Ionicons) |
+| State / actions | React Context (`SduiProvider`): state bag, nav stack, sheet slot |
+| Perf tooling | Custom TTR/TTI marks · rAF scroll-jank tracker · `adb logcat` |
+| Testing ground | Android emulator (Pixel 7, Android 16), release builds |
+
+---
+
+<details>
+<summary><b>📖 Full design write-up</b> (screen choice, architecture, schema, versioning, trade-offs)</summary>
+
 
 Server-Driven UI system for the Cars24 home/landing page — the page is rendered
 entirely from a JSON payload by a generic component registry, not hardcoded
@@ -201,3 +248,9 @@ section in your README is enough" allowance.
 See the tree in **Architecture overview** above. Also see `PERF.md`,
 `COVERAGE.md`, `AI_WORKFLOW.md`, and `docs/` for research notes,
 screenshots, and the schema design log kept while building.
+
+</details>
+
+---
+
+Built by **Anubhav Shukla** · [Portfolio](https://anubhav-shukla.netlify.app) · [LinkedIn](https://www.linkedin.com/in/anubhav-shukla-6028041ab)
